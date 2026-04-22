@@ -630,6 +630,24 @@ textarea { resize: none; }
   100% { r: 11;  opacity: 0;  }
 }
 
+.hvz-grad-line {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: .65rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.5);
+  letter-spacing: .04em;
+  margin-bottom: .75rem;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.hvz-grad-line svg {
+  color: var(--sky);
+  flex-shrink: 0;
+  opacity: .85;
+}
+
 .hvz-metrics {
   display: flex;
   align-items: center;

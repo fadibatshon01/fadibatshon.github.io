@@ -61,24 +61,56 @@
       </div>
     </div>
 
-    <!-- Floating analytics card — visible at 1380px+ -->
-    <div class="hero-visual" aria-hidden="true">
-      <div class="hv-card">
-        <div class="hv-avail">
-          <span class="hv-dot"></span>
-          <span class="hv-avail-label">Open to Opportunities</span>
+    <!-- Hero data-viz panel — visible at 1380px+ -->
+    <div class="hero-viz" aria-hidden="true">
+      <div class="hvz-card">
+        <div class="hvz-header">
+          <div class="hvz-live">
+            <span class="hvz-live-dot"></span>
+            <span>Open to Opportunities</span>
+          </div>
+          <span class="hvz-year-badge">Jun 2027</span>
         </div>
-        <div class="hv-divider"></div>
-        <p class="hv-card-label">Currently</p>
-        <ul class="hv-curr-list">
-          <li>Graduating June 2026</li>
-          <li>Seeking: Consulting &amp; Finance</li>
-          <li>Building: Trading Analytics Engine</li>
-        </ul>
+        <div class="hvz-chart-wrap">
+          <svg class="hvz-svg" viewBox="0 0 280 90" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#5AAFD4" stop-opacity="0.38"/>
+                <stop offset="100%" stop-color="#5AAFD4" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <path class="hvz-area" d="M0,80 C35,72 55,60 85,48 S125,34 155,26 S195,14 225,19 S258,11 280,5 L280,90 L0,90 Z"/>
+            <path class="hvz-line" d="M0,80 C35,72 55,60 85,48 S125,34 155,26 S195,14 225,19 S258,11 280,5"/>
+            <circle class="hvz-endot" cx="280" cy="5" r="3.5"/>
+            <circle class="hvz-pulse-ring" cx="280" cy="5" r="3.5"/>
+          </svg>
+          <div class="hvz-chart-label">Growth Trajectory</div>
+        </div>
+        <div class="hvz-metrics">
+          <div class="hvz-metric">
+            <span class="hvz-mval">3.92</span>
+            <span class="hvz-mlab">GPA</span>
+          </div>
+          <div class="hvz-vline"></div>
+          <div class="hvz-metric">
+            <span class="hvz-mval">8+</span>
+            <span class="hvz-mlab">Projects</span>
+          </div>
+          <div class="hvz-vline"></div>
+          <div class="hvz-metric">
+            <span class="hvz-mval">Top 5%</span>
+            <span class="hvz-mlab">Class Rank</span>
+          </div>
+        </div>
+        <div class="hvz-tags">
+          <span class="hvz-tag">Consulting</span>
+          <span class="hvz-tag">Finance</span>
+          <span class="hvz-tag">Analytics</span>
+        </div>
       </div>
       <div class="hv-pill hv-pill-1">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-        Available June 2026
+        Available June 2027
       </div>
       <div class="hv-pill hv-pill-2">UC San Diego · Rady</div>
     </div>

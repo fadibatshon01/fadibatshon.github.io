@@ -12,7 +12,7 @@
   <link rel="icon" type="image/x-icon" href="favicons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png" />
   <link rel="stylesheet" href="style.css" />
-  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.0.1/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body class="dark-mode">
 
@@ -325,16 +325,19 @@ function initChart() {
     borderVisible: false, wickUpColor: '#27ae60', wickDownColor: '#e74c3c',
   });
   volumeSeries = chart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: 'vol' });
-  chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+  volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
   window.addEventListener('resize', () => chart.applyOptions({ width: el.clientWidth }));
 }
 
 function applyChart(candles, tfDays) {
-  const cut = new Date(Date.now() - tfDays*86400000).toISOString().split('T')[0];
-  const d   = candles.filter(c => c.time >= cut);
-  candleSeries.setData(d.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
-  volumeSeries.setData(d.map(c => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(39,174,96,.3)' : 'rgba(231,76,60,.3)' })));
-  chart.timeScale().fitContent();
+  if (!chart || !candleSeries) return;
+  try {
+    const cut = new Date(Date.now() - tfDays*86400000).toISOString().split('T')[0];
+    const d   = candles.filter(c => c.time >= cut);
+    candleSeries.setData(d.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
+    if (volumeSeries) volumeSeries.setData(d.map(c => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(39,174,96,.3)' : 'rgba(231,76,60,.3)' })));
+    chart.timeScale().fitContent();
+  } catch(e) { console.warn('Chart render failed:', e); }
 }
 
 /* ── Render: header ── */
@@ -595,7 +598,7 @@ document.querySelectorAll('.tf-btn').forEach(btn => {
 
 /* ── Init ── */
 async function init() {
-  initChart();
+  try { initChart(); } catch(e) { console.warn('Chart init failed:', e); $('priceChart').style.display = 'none'; }
   const list = getWL();
   const wlEl = $('wlList');
   list.forEach(sym => { const el = renderWLItem(sym, null, null); wlEl.appendChild(el); });

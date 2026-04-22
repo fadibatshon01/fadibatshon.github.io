@@ -416,7 +416,7 @@ textarea { resize: none; }
    ABOUT — tinted off background
    ============================================================ */
 .about {
-  padding: 8rem 0;
+  padding: 5rem 0;
   background-color: var(--off);
 }
 
@@ -510,7 +510,7 @@ textarea { resize: none; }
    PROJECTS — white, cards with sky hover accent
    ============================================================ */
 .projects {
-  padding: 8rem 0;
+  padding: 5rem 0;
   background-color: var(--white);
   background-image:
     radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(27,52,84,.04) 100%),
@@ -639,7 +639,7 @@ textarea { resize: none; }
    RESUME — off background
    ============================================================ */
 .resume {
-  padding: 8rem 0;
+  padding: 5rem 0;
   background-color: var(--off);
 }
 
@@ -827,7 +827,7 @@ textarea { resize: none; }
    CONTACT — white
    ============================================================ */
 .contact {
-  padding: 8rem 0;
+  padding: 5rem 0;
   background-color: var(--white);
   background-image:
     radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(27,52,84,.04) 100%),
@@ -1033,7 +1033,7 @@ textarea { resize: none; }
 @media (max-width: 520px) {
   .container { padding: 0 1.25rem; }
   .hero { padding: 5.5rem 1.25rem 0; }
-  .about, .projects, .resume, .contact { padding: 5rem 0; }
+  .about, .projects, .resume, .contact { padding: 3rem 0; }
   .hero::after { display: none; }
   .footer-inner { flex-direction: column; gap: .75rem; text-align: center; }
   .footer-links { justify-content: center; }

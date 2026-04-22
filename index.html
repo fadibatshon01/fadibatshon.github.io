@@ -59,6 +59,44 @@
       </div>
     </div>
 
+    <!-- Floating analytics card — visible at 1380px+ -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hv-card">
+        <p class="hv-card-label">Analytics Snapshot</p>
+        <div class="hv-sparkline">
+          <svg viewBox="0 0 190 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#5aafd4" stop-opacity=".22"/>
+                <stop offset="100%" stop-color="#5aafd4" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 62 C25 56 38 46 58 38 C78 30 88 19 108 13 C128 7 148 6 168 4 L190 2 L190 72 L0 72 Z" fill="url(#sg)"/>
+            <path d="M0 62 C25 56 38 46 58 38 C78 30 88 19 108 13 C128 7 148 6 168 4 L190 2" stroke="#5aafd4" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="58" cy="38" r="3.5" fill="#5aafd4"/>
+            <circle cx="108" cy="13" r="3.5" fill="#5aafd4"/>
+            <circle cx="190" cy="2" r="4.5" fill="#1b3454"/>
+          </svg>
+        </div>
+        <div class="hv-card-metrics">
+          <div class="hv-metric">
+            <span class="hv-metric-n">+1.8%</span>
+            <span class="hv-metric-l">Alpha</span>
+          </div>
+          <div class="hv-metric-sep"></div>
+          <div class="hv-metric">
+            <span class="hv-metric-n">85%</span>
+            <span class="hv-metric-l">ML Accuracy</span>
+          </div>
+        </div>
+      </div>
+      <div class="hv-pill hv-pill-1">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        Dean's List
+      </div>
+      <div class="hv-pill hv-pill-2">UC San Diego · Rady</div>
+    </div>
+
     <div class="hero-stats">
       <div class="stat">
         <span class="stat-n">3.92</span>
@@ -88,6 +126,7 @@
       <div class="about-grid">
 
         <div class="about-left fade-in">
+          <div class="about-avatar"><span>FB</span></div>
           <p class="sec-label">01 — About</p>
           <h2 class="sec-h">Analytical<br>by nature.<br>Strategic<br>by design.</h2>
         </div>
@@ -130,6 +169,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
             <span class="proj-num">01</span>
             <h3 class="proj-title">Systematic Trading &amp; Performance Analytics Engine</h3>
             <p class="proj-desc">Architected a trading framework integrating live market data with MA crossovers, RSI, and volatility models across 5 stocks — automating multi-asset backtesting with 70% predictive accuracy across 10,000+ data points per run.</p>
@@ -143,6 +183,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
             <span class="proj-num">02</span>
             <h3 class="proj-title">Multi-Sector Equity Portfolio &amp; Analytics Model</h3>
             <p class="proj-desc">Built a 14-stock, 7-sector portfolio using variance-covariance matrices and mean-variance optimization, benchmarking against the S&amp;P 500. Applied CAPM, Jensen's Alpha, and Sharpe ratio — generating 1.8% alpha and 18% efficiency gains.</p>
@@ -156,6 +197,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="5" y1="17" x2="19" y2="17"/></svg></div>
             <span class="proj-num">03</span>
             <h3 class="proj-title">Multi-Horizon Equity Forecasting &amp; ML Engine</h3>
             <p class="proj-desc">Developed a Random Forest and Ridge regression engine in Python, engineering 22 features across price, volatility, and macro indicators — achieving 72–85% high-conviction directional accuracy with real-time Google Sheets delivery.</p>
@@ -169,6 +211,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
             <span class="proj-num">04</span>
             <h3 class="proj-title">Corporate Valuation &amp; Investment Screening Engine</h3>
             <p class="proj-desc">Engineered a DCF, WACC, and Monte Carlo valuation platform across 1,000+ iterations. Designed a screening framework across 12+ companies and 6 sectors using IRR hurdles and scenario matrices to generate structured buy/pass recommendations.</p>
@@ -182,6 +225,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg></div>
             <span class="proj-num">05</span>
             <h3 class="proj-title">Liquidity Forecasting</h3>
             <p class="proj-desc">Streamlined liquidity-forecasting engine supporting treasury operations through automated cash-flow modeling and stress-scenario analysis. Projects 30-day baseline and stressed liquidity.</p>
@@ -194,6 +238,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
             <span class="proj-num">06</span>
             <h3 class="proj-title">Investor Sentiment</h3>
             <p class="proj-desc">Sentiment-driven market intelligence engine mapping news flow to short-term price behavior. Aggregates headlines, scores sentiment, and aligns with next-day returns and market buckets.</p>
@@ -207,6 +252,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
             <span class="proj-num">07</span>
             <h3 class="proj-title">Real Estate Valuation</h3>
             <p class="proj-desc">Dynamic Excel framework evaluating property investments through automated rent-roll forecasts, debt waterfalls, and scenario testing. Calculates NOI, DSCR, IRR, and NPV.</p>
@@ -219,6 +265,7 @@
 
         <article class="proj-card fade-in">
           <div class="proj-inner">
+            <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
             <span class="proj-num">08</span>
             <h3 class="proj-title">ROI Project</h3>
             <p class="proj-desc">Excel-based investment evaluation engine analyzing project returns through automated cash-flow modeling and multi-scenario testing. Computes NPV, IRR, ROI, and MIRR with sensitivity heatmaps.</p>
@@ -411,6 +458,10 @@
       <div class="contact-grid">
 
         <div class="contact-left fade-in">
+          <div class="c-availability">
+            <span class="c-avail-dot"></span>
+            Open to opportunities
+          </div>
           <a href="mailto:fbatshon@ucsd.edu" class="clink">
             <span class="clink-label">Email</span>
             <span class="clink-val">fbatshon@ucsd.edu</span>

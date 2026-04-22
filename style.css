@@ -249,39 +249,19 @@ textarea { resize: none; }
   padding: 8rem 2rem 0;
   background-color: var(--white);
   background-image:
-    radial-gradient(circle, rgba(70,150,205,.28) 1.5px, transparent 1.5px),
-    linear-gradient(rgba(70,150,205,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(70,150,205,.05) 1px, transparent 1px);
-  background-size: 28px 28px, 28px 28px, 28px 28px;
+    radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(27,52,84,.07) 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 38px,
+      rgba(27,52,84,.028) 38px,
+      rgba(27,52,84,.028) 39px
+    );
 }
 
-/* JS-driven gradient orbs */
-.hero-blob {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.hero-blob-1 {
-  width: 62%; height: 85%;
-  top: -10%; right: -8%;
-  background: radial-gradient(ellipse at center,
-    rgba(60,140,195,.42) 0%,
-    rgba(70,150,205,.18) 45%,
-    transparent 70%);
-  filter: blur(52px);
-}
-
-.hero-blob-2 {
-  width: 44%; height: 62%;
-  bottom: -10%; left: -6%;
-  background: radial-gradient(ellipse at center,
-    rgba(55,130,190,.28) 0%,
-    rgba(90,175,212,.1) 55%,
-    transparent 75%);
-  filter: blur(68px);
-}
+/* gradient orbs — hidden, kept for JS cursor-glow compatibility */
+.hero-blob { opacity: 0; position: absolute; pointer-events: none; }
+.hero-blob-1, .hero-blob-2 { opacity: 0; }
 
 /* Cursor spotlight */
 .cursor-glow {
@@ -295,6 +275,18 @@ textarea { resize: none; }
   opacity: 0;
   transition: opacity .4s;
   transform: translate(-50%, -50%);
+}
+
+/* noise grain overlay */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: .045;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ghost mark */

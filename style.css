@@ -5,8 +5,8 @@
   --navy:      #1b3454;
   --navy-dark: #122540;
   --sky:       #5aafd4;
-  --sky-light: rgba(90,175,212,.09);
-  --sky-mid:   rgba(90,175,212,.2);
+  --sky-light: rgba(70,150,205,.14);
+  --sky-mid:   rgba(70,150,205,.28);
   --white:     #ffffff;
   --off:       #f2f7fb;
   --text:      #1b3454;
@@ -248,8 +248,11 @@ textarea { resize: none; }
   overflow: hidden;
   padding: 8rem 2rem 0;
   background-color: var(--white);
-  background-image: radial-gradient(circle, rgba(90,175,212,.14) 1.5px, transparent 1.5px);
-  background-size: 30px 30px;
+  background-image:
+    radial-gradient(circle, rgba(70,150,205,.28) 1.5px, transparent 1.5px),
+    linear-gradient(rgba(70,150,205,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(70,150,205,.05) 1px, transparent 1px);
+  background-size: 28px 28px, 28px 28px, 28px 28px;
 }
 
 /* animated sky blob top-right */
@@ -259,8 +262,8 @@ textarea { resize: none; }
   top: -8%; right: -6%;
   width: 62%; height: 85%;
   background: radial-gradient(ellipse at 55% 30%,
-    rgba(90,175,212,.2) 0%,
-    rgba(90,175,212,.08) 45%,
+    rgba(60,140,195,.35) 0%,
+    rgba(70,150,205,.16) 45%,
     transparent 70%);
   pointer-events: none;
   animation: heroBlob 13s ease-in-out infinite;
@@ -487,32 +490,63 @@ textarea { resize: none; }
   margin-bottom: .9rem;
 }
 
-.hv-sparkline { width: 100%; margin-bottom: .9rem; }
-.hv-sparkline svg { width: 100%; height: auto; display: block; }
-
-.hv-card-metrics {
+.hv-avail {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding-top: .75rem;
-  border-top: 1px solid var(--border);
+  gap: .55rem;
+  margin-bottom: .85rem;
 }
 
-.hv-metric { display: flex; flex-direction: column; gap: .1rem; }
-.hv-metric-n {
-  font-family: var(--f-serif);
-  font-size: 1.2rem;
-  font-weight: 600;
+.hv-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2ecc71;
+  flex-shrink: 0;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,.55); }
+  50%       { box-shadow: 0 0 0 5px rgba(46,204,113,0); }
+}
+
+.hv-avail-label {
+  font-size: .72rem;
+  font-weight: 700;
   color: var(--navy);
-  line-height: 1.1;
+  letter-spacing: .02em;
 }
-.hv-metric-l {
-  font-size: .58rem;
-  letter-spacing: .1em;
-  text-transform: uppercase;
+
+.hv-divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: .85rem;
+}
+
+.hv-curr-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+
+.hv-curr-list li {
+  font-size: .68rem;
   color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: .4rem;
 }
-.hv-metric-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+
+.hv-curr-list li::before {
+  content: '→';
+  color: var(--sky);
+  font-size: .65rem;
+  flex-shrink: 0;
+}
 
 /* Floating pills */
 .hv-pill {

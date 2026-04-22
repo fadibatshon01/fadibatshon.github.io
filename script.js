@@ -163,6 +163,72 @@ function isValidEmail(v) {
 }
 
 /* ============================================================
+   HERO BLOBS — mouse-tracking gradient orbs with lerp easing
+   ============================================================ */
+(function () {
+  const hero  = document.querySelector('.hero');
+  const blob1 = document.querySelector('.hero-blob-1');
+  const blob2 = document.querySelector('.hero-blob-2');
+  const glow  = document.querySelector('.cursor-glow');
+  if (!hero || !blob1 || !blob2) return;
+
+  let tx1 = 0, ty1 = 0, cx1 = 0, cy1 = 0;
+  let tx2 = 0, ty2 = 0, cx2 = 0, cy2 = 0;
+  let glowX = window.innerWidth / 2, glowY = window.innerHeight / 2;
+  let gCX = glowX, gCY = glowY;
+
+  hero.addEventListener('mousemove', e => {
+    const r  = hero.getBoundingClientRect();
+    const mx = (e.clientX - r.left) / r.width  - 0.5;
+    const my = (e.clientY - r.top)  / r.height - 0.5;
+    tx1 = mx * 95;  ty1 = my * 70;
+    tx2 = -mx * 60; ty2 = -my * 50;
+    if (glow) glow.style.opacity = '1';
+  });
+
+  hero.addEventListener('mouseleave', () => {
+    tx1 = ty1 = tx2 = ty2 = 0;
+    if (glow) glow.style.opacity = '0';
+  });
+
+  document.addEventListener('mousemove', e => {
+    glowX = e.clientX;
+    glowY = e.clientY;
+  });
+
+  function tick() {
+    cx1 += (tx1 - cx1) * 0.038;
+    cy1 += (ty1 - cy1) * 0.038;
+    cx2 += (tx2 - cx2) * 0.055;
+    cy2 += (ty2 - cy2) * 0.055;
+    gCX += (glowX - gCX) * 0.1;
+    gCY += (glowY - gCY) * 0.1;
+
+    blob1.style.transform = `translate(${cx1}px, ${cy1}px)`;
+    blob2.style.transform = `translate(${cx2}px, ${cy2}px)`;
+    if (glow) glow.style.transform = `translate(calc(-50% + ${gCX}px), calc(-50% + ${gCY}px))`;
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+/* ============================================================
+   PROJECT CARDS — 3D tilt on hover
+   ============================================================ */
+document.querySelectorAll('.proj-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    card.style.transform = `perspective(700px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) translateY(-6px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+/* ============================================================
    SMOOTH SCROLL POLISH — offset for fixed navbar
    ============================================================ */
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {

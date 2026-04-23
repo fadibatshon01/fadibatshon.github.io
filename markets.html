@@ -882,7 +882,8 @@ async function refreshWL() {
 
 /* ── Navbar & mobile menu ── */
 const navbar = $('navbar');
-window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 60), { passive: true });
+/* Dashboard navbar stays compact at all scroll positions so tape never gets covered */
+window.addEventListener('scroll', () => navbar.classList.add('scrolled'), { passive: true });
 
 const navToggle = $('navToggle'), mobileMenu = $('mobileMenu');
 let menuOpen = false;

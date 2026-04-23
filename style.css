@@ -1417,13 +1417,10 @@ body.dark-mode .footer-links a:hover { color: var(--sky); }
   min-height: 100vh;
 }
 
-/* Ticker tape — sticky strip just below the fixed navbar */
+/* Ticker tape — full-width strip at top of dashboard */
 .ticker-tape-outer {
   width: 100%;
   flex-shrink: 0;
-  position: sticky;
-  top: 70px;
-  z-index: 95;
   border-bottom: 1px solid rgba(90,175,212,.15);
   overflow: hidden;
 }
@@ -1442,8 +1439,8 @@ body.dark-mode .footer-links a:hover { color: var(--sky); }
   background: #0d1f33;
   border-right: 1px solid rgba(90,175,212,.1);
   position: sticky;
-  top: 116px;
-  height: calc(100vh - 116px);
+  top: 70px;
+  height: calc(100vh - 70px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;

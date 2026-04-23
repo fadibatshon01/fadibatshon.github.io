@@ -169,27 +169,6 @@
         </div>
       </div>
 
-      <!-- Action signal -->
-      <div class="action-panel">
-        <div class="action-left">
-          <p class="d-panel-title">Action Signal</p>
-          <span class="action-badge" id="actionBadge">—</span>
-        </div>
-        <div class="action-right">
-          <p class="action-reasons-title">Contributing factors</p>
-          <ul class="action-reason-list" id="actionList">
-            <li style="color:rgba(204,224,239,.3)">Loading analysis…</li>
-          </ul>
-        </div>
-        <div class="strategy-row" id="strategyRow" style="display:none">
-          <span class="strategy-chip" id="strategyChip"></span>
-          <div class="strategy-meta">
-            <span class="strategy-dir" id="strategyDir"></span>
-            <span class="strategy-note" id="strategyNote"></span>
-          </div>
-        </div>
-      </div>
-
       <!-- Events & Catalysts -->
       <div class="events-panel" id="eventsPanel">
         <p class="d-panel-title">Events &amp; Catalysts</p>
@@ -495,15 +474,6 @@ function calcAction(q, metrics) {
   else if (score >= -2)   { label = 'Caution';     color = '#e67e22'; border = 'rgba(230,126,34,.35)'; }
   else                    { label = 'Reduce';      color = '#e74c3c'; border = 'rgba(231,76,60,.35)'; }
   return { label, color, border, reasons };
-}
-
-function renderAction(a) {
-  const el = $('actionBadge');
-  el.textContent = a.label;
-  el.style.color = a.color;
-  el.style.borderColor = a.border;
-  el.style.background  = a.border.replace(/[\d.]+\)$/, '0.08)');
-  $('actionList').innerHTML = a.reasons.map(r => `<li>${r}</li>`).join('');
 }
 
 /* ── Render: key stats ── */
@@ -837,61 +807,6 @@ function renderEvents(earnings) {
   c.innerHTML = html;
 }
 
-/* ── Strategy output ── */
-function calcStrategy(q, metrics) {
-  const m = metrics?.metric || {};
-  const action = calcAction(q, metrics);
-  const hi = m['52WeekHigh'], lo = m['52WeekLow'];
-  const price = q?.c;
-  const pe = m.peBasicExclExtraTTM;
-  const beta = m.beta;
-
-  let type, direction, risk, chipColor, chipBorder, note;
-
-  const pos = (hi && lo && price) ? (price - lo) / (hi - lo) * 100 : null;
-
-  /* Setup type */
-  if (pos != null && pos < 20)       type = 'Breakout Watch';
-  else if (pos != null && pos > 80)  type = 'Momentum Play';
-  else                               type = 'Range Trade';
-
-  /* Direction */
-  if (action.label === 'Strong Buy' || action.label === 'Buy')     direction = 'Bullish Bias';
-  else if (action.label === 'Caution' || action.label === 'Reduce') direction = 'Bearish Bias';
-  else                                                               direction = 'Neutral / Wait';
-
-  /* Risk */
-  if (beta != null && beta > 1.8)   risk = 'High Risk';
-  else if (beta != null && beta < 0.7) risk = 'Low Risk';
-  else                               risk = 'Moderate Risk';
-
-  /* Chip color */
-  if (direction === 'Bullish Bias')  { chipColor = 'rgba(39,174,96,.15)'; chipBorder = 'rgba(39,174,96,.35)'; }
-  else if (direction === 'Bearish Bias') { chipColor = 'rgba(231,76,60,.12)'; chipBorder = 'rgba(231,76,60,.3)'; }
-  else                               { chipColor = 'rgba(243,156,18,.1)'; chipBorder = 'rgba(243,156,18,.28)'; }
-
-  /* Trade note */
-  if (type === 'Breakout Watch') note = `Price near 52W low — watch for volume confirmation before entering. Stop below recent low.`;
-  else if (type === 'Momentum Play') note = `Extended near highs — momentum traders can trail stops; new entries require a pullback to reduce risk.`;
-  else note = `Range-bound — consider mean-reversion entries near support with defined risk to resistance.`;
-
-  return { type, direction, risk, chipColor, chipBorder, note };
-}
-
-function renderStrategy(strat) {
-  const row = $('strategyRow');
-  const chip = $('strategyChip');
-  const dir  = $('strategyDir');
-  const note = $('strategyNote');
-  chip.textContent = strat.type;
-  chip.style.background = strat.chipColor;
-  chip.style.border = `1px solid ${strat.chipBorder}`;
-  chip.style.color = '#cce0ef';
-  dir.textContent  = `${strat.direction} · ${strat.risk}`;
-  note.textContent = strat.note;
-  row.style.display = 'flex';
-}
-
 /* ── Load stock ── */
 async function loadStock(sym) {
   if (activeSym === sym) return;
@@ -905,14 +820,12 @@ async function loadStock(sym) {
   $('hdrExch').textContent = $('hdrPrice').textContent = $('hdrChg').textContent = '';
   $('sigRows').innerHTML   = '<div class="d-skel" style="height:160px;margin:.25rem 0"></div>';
   $('keyStats').innerHTML  = '<div class="d-skel" style="height:160px;margin:.25rem 0"></div>';
-  $('actionBadge').textContent = '—'; $('actionList').innerHTML = '<li style="color:rgba(204,224,239,.3)">Loading…</li>';
   $('newsItems').innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.3);padding:.5rem 0">Loading…</p>';
   $('techAnalysisContainer').innerHTML = '<div class="d-skel" style="height:680px"></div>';
   $('fundamentalsContainer').innerHTML  = '<div class="d-skel" style="height:680px"></div>';
   $('insightRow').innerHTML = '<div class="insight-card d-skel" style="min-height:100px"></div>'.repeat(4);
   $('keyQGrid').innerHTML  = '<div class="d-skel" style="height:120px;margin:.25rem 0"></div>';
   $('eventsContent').innerHTML = '<div class="d-skel" style="height:80px;margin:.25rem 0"></div>';
-  $('strategyRow').style.display = 'none';
 
   const [qR, pR, mR, nR, eR] = await Promise.allSettled([
     fetchQuote(sym), fetchProfile(sym), fetchMetrics(sym), fetchNews(sym), fetchEarnings(sym)
@@ -932,13 +845,11 @@ async function loadStock(sym) {
   loadTechAnalysis(tvSymbol);
   loadFundamentals(tvSymbol);
   renderContext(q, m);
-  renderAction(calcAction(q, m));
   renderStats(q, m);
   renderNews(n);
   renderInsights(generateInsights(q, m));
   renderKeyQuestions(q, m, e);
   renderEvents(e);
-  renderStrategy(calcStrategy(q, m));
 }
 
 /* ── Add ticker ── */

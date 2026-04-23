@@ -50,8 +50,8 @@
 
     <!-- Ticker tape — full width -->
     <div class="ticker-tape-outer">
-      <div class="tradingview-widget-container" style="height:52px">
-        <div class="tradingview-widget-container__widget" style="height:52px"></div>
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
         {
           "symbols": [
@@ -69,7 +69,7 @@
             {"description":"Crude Oil","proName":"NYMEX:CL1!"}
           ],
           "showSymbolLogo": true,
-          "isTransparent": true,
+          "isTransparent": false,
           "displayMode": "adaptive",
           "colorTheme": "dark",
           "locale": "en"
@@ -133,11 +133,11 @@
       <div class="tv-widget-grid">
         <div class="tv-widget-panel">
           <p class="d-panel-title">Technical Analysis</p>
-          <div class="tv-widget-container" id="techAnalysisContainer" style="height:425px"></div>
+          <div class="tradingview-widget-container tv-widget-container" id="techAnalysisContainer" style="height:700px"></div>
         </div>
         <div class="tv-widget-panel">
           <p class="d-panel-title">Fundamental Data</p>
-          <div class="tv-widget-container" id="fundamentalsContainer" style="height:425px"></div>
+          <div class="tradingview-widget-container tv-widget-container" id="fundamentalsContainer" style="height:700px"></div>
         </div>
       </div>
 
@@ -593,16 +593,17 @@ function loadTVEmbed(containerId, scriptSrc, config) {
 function loadTechAnalysis(tvSymbol) {
   loadTVEmbed('techAnalysisContainer',
     'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js',
-    { interval: '1D', isTransparent: true, colorTheme: 'dark', symbol: tvSymbol,
-      showIntervalTabs: true, displayMode: 'single', locale: 'en', width: '100%', height: 400 }
+    { colorTheme: 'dark', displayMode: 'multiple', isTransparent: true,
+      locale: 'en', interval: '1D', disableInterval: false,
+      width: '100%', height: 680, symbol: tvSymbol, showIntervalTabs: true }
   );
 }
 
 function loadFundamentals(tvSymbol) {
   loadTVEmbed('fundamentalsContainer',
     'https://s3.tradingview.com/external-embedding/embed-widget-financials.js',
-    { isTransparent: true, displayMode: 'regular', colorTheme: 'dark',
-      symbol: tvSymbol, locale: 'en', width: '100%', height: 400 }
+    { symbol: tvSymbol, colorTheme: 'dark', displayMode: 'regular',
+      isTransparent: true, locale: 'en', width: '100%', height: 680 }
   );
 }
 
@@ -906,8 +907,8 @@ async function loadStock(sym) {
   $('keyStats').innerHTML  = '<div class="d-skel" style="height:160px;margin:.25rem 0"></div>';
   $('actionBadge').textContent = '—'; $('actionList').innerHTML = '<li style="color:rgba(204,224,239,.3)">Loading…</li>';
   $('newsItems').innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.3);padding:.5rem 0">Loading…</p>';
-  $('techAnalysisContainer').innerHTML = '<div class="d-skel" style="height:100%;min-height:380px"></div>';
-  $('fundamentalsContainer').innerHTML  = '<div class="d-skel" style="height:100%;min-height:380px"></div>';
+  $('techAnalysisContainer').innerHTML = '<div class="d-skel" style="height:680px"></div>';
+  $('fundamentalsContainer').innerHTML  = '<div class="d-skel" style="height:680px"></div>';
   $('insightRow').innerHTML = '<div class="insight-card d-skel" style="min-height:100px"></div>'.repeat(4);
   $('keyQGrid').innerHTML  = '<div class="d-skel" style="height:120px;margin:.25rem 0"></div>';
   $('eventsContent').innerHTML = '<div class="d-skel" style="height:80px;margin:.25rem 0"></div>';

@@ -77,12 +77,31 @@
         </div>
       </div>
 
+      <!-- Macro bar -->
+      <div class="macro-bar" id="macroBar">
+        <span class="macro-bar-label">Market</span>
+        <div class="macro-item" id="macroSPY"><span class="macro-sym">SPY</span><span class="macro-price">—</span><span class="macro-chg">—</span></div>
+        <div class="macro-divider"></div>
+        <div class="macro-item" id="macroQQQ"><span class="macro-sym">QQQ</span><span class="macro-price">—</span><span class="macro-chg">—</span></div>
+        <div class="macro-divider"></div>
+        <div class="macro-item" id="macroDIA"><span class="macro-sym">DIA</span><span class="macro-price">—</span><span class="macro-chg">—</span></div>
+        <span class="regime-badge regime-neu" id="regimeBadge">Loading…</span>
+      </div>
+
       <!-- TradingView chart -->
       <div class="chart-panel" id="chartPanel">
         <div class="chart-tv-note">
           <span>Interactive chart · RSI, MACD &amp; more available via the chart toolbar</span>
         </div>
         <div id="tvContainer" style="height:420px"></div>
+      </div>
+
+      <!-- Insight cards -->
+      <div class="insight-row" id="insightRow">
+        <div class="insight-card d-skel" style="min-height:100px"></div>
+        <div class="insight-card d-skel" style="min-height:100px"></div>
+        <div class="insight-card d-skel" style="min-height:100px"></div>
+        <div class="insight-card d-skel" style="min-height:100px"></div>
       </div>
 
       <!-- Analysis grid -->
@@ -97,6 +116,14 @@
         </div>
       </div>
 
+      <!-- Key questions -->
+      <div class="kq-panel">
+        <p class="d-panel-title">Key Questions</p>
+        <div class="kq-grid" id="keyQGrid">
+          <div class="d-skel" style="height:120px;margin:.25rem 0"></div>
+        </div>
+      </div>
+
       <!-- Action signal -->
       <div class="action-panel">
         <div class="action-left">
@@ -108,6 +135,46 @@
           <ul class="action-reason-list" id="actionList">
             <li style="color:rgba(204,224,239,.3)">Loading analysis…</li>
           </ul>
+        </div>
+        <div class="strategy-row" id="strategyRow" style="display:none">
+          <span class="strategy-chip" id="strategyChip"></span>
+          <div class="strategy-meta">
+            <span class="strategy-dir" id="strategyDir"></span>
+            <span class="strategy-note" id="strategyNote"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events & Catalysts -->
+      <div class="events-panel" id="eventsPanel">
+        <p class="d-panel-title">Events &amp; Catalysts</p>
+        <div id="eventsContent"><div class="d-skel" style="height:80px;margin:.25rem 0"></div></div>
+      </div>
+
+      <!-- S&P 500 Sector Heatmap -->
+      <div class="heatmap-panel">
+        <p class="d-panel-title">S&amp;P 500 Sector Heatmap</p>
+        <div class="tradingview-widget-container" style="height:400px">
+          <div class="tradingview-widget-container__widget" style="height:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
+          {
+            "exchanges": [],
+            "dataSource": "SPX500",
+            "grouping": "sector",
+            "blockSize": "market_cap_basic",
+            "blockColor": "change",
+            "locale": "en",
+            "symbolUrl": "",
+            "colorTheme": "dark",
+            "hasTopBar": false,
+            "isDataSetEnabled": false,
+            "isZoomEnabled": true,
+            "hasSymbolTooltip": true,
+            "isMonoSize": false,
+            "width": "100%",
+            "height": "400"
+          }
+          </script>
         </div>
       </div>
 
@@ -459,6 +526,291 @@ function renderWLItem(sym, q) {
   return isNew ? item : null;
 }
 
+/* ── Fetch earnings ── */
+function fetchEarnings(sym) {
+  const to   = new Date(Date.now() + 90*86400*1000).toISOString().split('T')[0];
+  const from = new Date(Date.now() - 365*86400*1000).toISOString().split('T')[0];
+  return api(`/calendar/earnings?symbol=${sym}&from=${from}&to=${to}`);
+}
+
+/* ── Macro bar ── */
+async function loadMacroBar() {
+  const syms = ['SPY','QQQ','DIA'];
+  const ids  = ['macroSPY','macroQQQ','macroDIA'];
+  const quotes = await Promise.allSettled(syms.map(fetchQuote));
+  let spyDp = null, qqqDp = null;
+  quotes.forEach((r, i) => {
+    if (r.status !== 'fulfilled') return;
+    const q = r.value;
+    const el = $(ids[i]);
+    if (!el || !q?.c) return;
+    const up = q.dp >= 0, sign = up ? '+' : '';
+    el.querySelector('.macro-price').textContent = `$${fmt(q.c)}`;
+    const chgEl = el.querySelector('.macro-chg');
+    chgEl.textContent = `${sign}${fmt(q.dp)}%`;
+    chgEl.className = `macro-chg ${up ? 'mkt-up' : 'mkt-down'}`;
+    if (i === 0) spyDp = q.dp;
+    if (i === 1) qqqDp = q.dp;
+  });
+  const badge = $('regimeBadge');
+  if (badge && spyDp != null && qqqDp != null) {
+    const avg = (spyDp + qqqDp) / 2;
+    if (avg > 0.4)       { badge.textContent = 'Risk-On';    badge.className = 'regime-badge regime-on'; }
+    else if (avg < -0.4) { badge.textContent = 'Risk-Off';   badge.className = 'regime-badge regime-off'; }
+    else                 { badge.textContent = 'Neutral';    badge.className = 'regime-badge regime-neu'; }
+  }
+}
+
+/* ── Insight cards ── */
+function generateInsights(q, metrics) {
+  const m = metrics?.metric || {};
+  const price = q?.c;
+  const insights = [];
+
+  /* Trend regime */
+  const hi = m['52WeekHigh'], lo = m['52WeekLow'];
+  if (hi && lo && price) {
+    const pos = (price - lo) / (hi - lo) * 100;
+    if (pos > 75) insights.push({ type: 'Trend', text: `Trading in the upper ${(100-pos).toFixed(0)}% of its 52-week range — strong uptrend momentum intact.`, confidence: Math.min(90, 50+pos/3), horizon: 'Swing / Long-term', confCls: 'conf-green' });
+    else if (pos < 25) insights.push({ type: 'Trend', text: `Near 52-week lows at ${pos.toFixed(0)}% of range — potential base building or continued weakness.`, confidence: Math.min(85, 40+pos), horizon: 'Swing', confCls: 'conf-yellow' });
+    else insights.push({ type: 'Trend', text: `Mid-range positioning at ${pos.toFixed(0)}% of 52W range — neither extended nor depressed.`, confidence: 55, horizon: 'Swing', confCls: 'conf-sky' });
+  }
+
+  /* Momentum */
+  if (q?.dp != null) {
+    const abs = Math.abs(q.dp);
+    if (q.dp > 2)       insights.push({ type: 'Momentum', text: `Strong positive session (+${fmt(q.dp)}%) — buyers in control today with above-average conviction.`, confidence: Math.min(88, 60+abs*5), horizon: 'Intraday / Swing', confCls: 'conf-green' });
+    else if (q.dp < -2) insights.push({ type: 'Momentum', text: `Heavy selling pressure (${fmt(q.dp)}%) — institutional distribution possible, watch for follow-through.`, confidence: Math.min(85, 60+abs*5), horizon: 'Intraday / Swing', confCls: 'conf-red' });
+    else                insights.push({ type: 'Momentum', text: `Low-conviction session (${fmt(q.dp)}%) — price action indecisive, await directional catalyst.`, confidence: 48, horizon: 'Intraday', confCls: 'conf-sky' });
+  }
+
+  /* Valuation */
+  const pe = m.peBasicExclExtraTTM;
+  if (pe && pe > 0) {
+    if (pe < 15)      insights.push({ type: 'Valuation', text: `P/E of ${fmt(pe)}x sits below the historical market average — potential value opportunity relative to peers.`, confidence: 72, horizon: 'Long-term', confCls: 'conf-green' });
+    else if (pe < 30) insights.push({ type: 'Valuation', text: `P/E of ${fmt(pe)}x is within fair-value range — market is pricing in moderate growth expectations.`, confidence: 65, horizon: 'Long-term', confCls: 'conf-sky' });
+    else              insights.push({ type: 'Valuation', text: `Elevated P/E of ${fmt(pe)}x means growth is heavily priced in — any miss on earnings could trigger a repricing.`, confidence: 70, horizon: 'Long-term', confCls: 'conf-yellow' });
+  }
+
+  /* Volatility */
+  const beta = m.beta;
+  if (beta != null) {
+    if (beta > 1.5)     insights.push({ type: 'Volatility', text: `Beta of ${fmt(beta)} — moves ${fmt(beta)}x the market. Elevated risk; size positions accordingly.`, confidence: 80, horizon: 'All timeframes', confCls: 'conf-red' });
+    else if (beta < 0.7) insights.push({ type: 'Volatility', text: `Low beta of ${fmt(beta)} — defensive characteristics, acts as a portfolio stabilizer in volatile markets.`, confidence: 78, horizon: 'All timeframes', confCls: 'conf-green' });
+    else                 insights.push({ type: 'Volatility', text: `Beta of ${fmt(beta)} — moves broadly in line with the market, moderate risk profile.`, confidence: 70, horizon: 'All timeframes', confCls: 'conf-sky' });
+  }
+
+  return insights.slice(0, 4);
+}
+
+function renderInsights(insights) {
+  const c = $('insightRow');
+  if (!insights.length) { c.innerHTML = ''; return; }
+  c.innerHTML = insights.map(ins => `
+    <div class="insight-card">
+      <span class="insight-type">${ins.type}</span>
+      <p class="insight-text">${ins.text}</p>
+      <div class="conf-track"><div class="conf-fill ${ins.confCls}" style="width:${ins.confidence.toFixed(0)}%"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="insight-horizon">${ins.horizon}</span>
+        <span class="conf-label">${ins.confidence.toFixed(0)}% confidence</span>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Key questions ── */
+function renderKeyQuestions(q, metrics, earnings) {
+  const m = metrics?.metric || {};
+  const price = q?.c;
+  const hi = m['52WeekHigh'], lo = m['52WeekLow'];
+  const pe = m.peBasicExclExtraTTM;
+  const eps = m.epsBasicExclExtraItemsTTM;
+  const beta = m.beta;
+
+  /* Q1: Trending or ranging? */
+  let q1a = '—', q1cls = '#7a9bb5';
+  if (hi && lo && price) {
+    const pos = (price - lo) / (hi - lo) * 100;
+    if (pos > 70)      { q1a = `Trending up — at ${pos.toFixed(0)}% of 52W range, showing sustained strength.`; q1cls = '#2ecc71'; }
+    else if (pos < 30) { q1a = `Trending down or basing — at ${pos.toFixed(0)}% of range, watch for reversal signals.`; q1cls = '#e74c3c'; }
+    else               { q1a = `Ranging — mid-range at ${pos.toFixed(0)}%, no clear directional bias.`; q1cls = '#f39c12'; }
+  }
+
+  /* Q2: Business fundamentally strong? */
+  let q2a = '—', q2cls = '#7a9bb5';
+  if (eps != null && pe != null) {
+    if (eps > 0 && pe > 0 && pe < 35) { q2a = `Yes — profitable with EPS $${fmt(eps)} and a reasonable P/E of ${fmt(pe)}x.`; q2cls = '#2ecc71'; }
+    else if (eps > 0)                  { q2a = `Profitable (EPS $${fmt(eps)}) but high P/E of ${fmt(pe)}x implies stretched expectations.`; q2cls = '#f39c12'; }
+    else                               { q2a = `Unprofitable currently (EPS $${fmt(eps)}) — valuation relies on future growth.`; q2cls = '#e74c3c'; }
+  } else if (eps != null) {
+    q2a = eps > 0 ? `Profitable — EPS $${fmt(eps)} TTM.` : `Currently unprofitable — EPS $${fmt(eps)}.`;
+    q2cls = eps > 0 ? '#2ecc71' : '#e74c3c';
+  }
+
+  /* Q3: Catalyst coming? */
+  let q3a = 'No upcoming earnings found in the next 90 days.', q3cls = '#7a9bb5';
+  if (earnings?.earningsCalendar?.length) {
+    const today = Date.now();
+    const upcoming = earnings.earningsCalendar.filter(e => {
+      const d = new Date(e.date).getTime();
+      return d >= today && d <= today + 90*86400*1000;
+    });
+    if (upcoming.length) {
+      const next = upcoming[0];
+      const daysAway = Math.ceil((new Date(next.date).getTime() - today)/86400000);
+      q3a = `Earnings in ${daysAway} day${daysAway===1?'':'s'} (${next.date}) — EPS est. ${next.epsEstimate != null ? `$${fmt(next.epsEstimate)}` : 'N/A'}.`;
+      q3cls = daysAway <= 14 ? '#f39c12' : '#5aafd4';
+    }
+  }
+
+  /* Q4: Institutions buying or selling? */
+  let q4a = '—', q4cls = '#7a9bb5';
+  if (q?.dp != null && hi && lo && price) {
+    const pos = (price - lo) / (hi - lo) * 100;
+    if (q.dp > 1.5 && pos > 50)  { q4a = `Likely buying — strong day gain (+${fmt(q.dp)}%) with price in upper range suggests accumulation.`; q4cls = '#2ecc71'; }
+    else if (q.dp < -1.5)        { q4a = `Possible distribution — notable selling (${fmt(q.dp)}%) may reflect institutional exits.`; q4cls = '#e74c3c'; }
+    else                         { q4a = `Inconclusive — today's move (${fmt(q.dp)}%) doesn't show clear institutional directional bias.`; q4cls = '#f39c12'; }
+  }
+
+  /* Q5: Entry worth considering? */
+  let q5a = '—', q5cls = '#7a9bb5';
+  const action = calcAction(q, metrics);
+  if (action.label === 'Strong Buy' || action.label === 'Buy') {
+    q5a = `Yes — composite signals favor entry: ${action.reasons[0]?.split('—')[0]?.trim() || action.label}.`;
+    q5cls = '#2ecc71';
+  } else if (action.label === 'Caution' || action.label === 'Reduce') {
+    q5a = `Not yet — risk factors outweigh opportunity at current levels.`;
+    q5cls = '#e74c3c';
+  } else {
+    q5a = `Hold — no strong edge in either direction. Wait for a clearer setup.`;
+    q5cls = '#f39c12';
+  }
+
+  const rows = [
+    { q: 'Is it trending or ranging?', a: q1a, col: q1cls },
+    { q: 'Is the business fundamentally strong?', a: q2a, col: q2cls },
+    { q: 'Is there a catalyst coming?', a: q3a, col: q3cls },
+    { q: 'Are institutions buying or selling?', a: q4a, col: q4cls },
+    { q: 'Is an entry worth considering now?', a: q5a, col: q5cls },
+  ];
+
+  $('keyQGrid').innerHTML = rows.map(r => `
+    <div class="kq-row">
+      <div class="kq-dot" style="background:${r.col}"></div>
+      <span class="kq-q">${r.q}</span>
+      <span class="kq-a">${r.a}</span>
+    </div>`).join('');
+}
+
+/* ── Events & Catalysts ── */
+function renderEvents(earnings) {
+  const c = $('eventsContent');
+  const cal = earnings?.earningsCalendar || [];
+  if (!cal.length) {
+    c.innerHTML = '<p style="font-size:.72rem;color:rgba(204,224,239,.35)">No earnings data available for this ticker.</p>';
+    return;
+  }
+
+  const today = Date.now();
+  const upcoming = cal.filter(e => new Date(e.date).getTime() >= today).slice(0, 2);
+  const past     = cal.filter(e => new Date(e.date).getTime() <  today && e.epsActual != null).slice(-4).reverse();
+
+  let html = '';
+
+  if (upcoming.length) {
+    html += '<p class="events-sub">Upcoming</p>';
+    upcoming.forEach(e => {
+      const daysAway = Math.ceil((new Date(e.date).getTime() - today)/86400000);
+      html += `<div class="event-row">
+        <span class="event-date">${e.date}</span>
+        <span class="event-period">${e.period || ''} · in ${daysAway}d</span>
+        <span class="event-badge ev-meet">Upcoming</span>
+        <span class="event-surprise" style="color:rgba(204,224,239,.4)">Est ${e.epsEstimate != null ? '$'+fmt(e.epsEstimate) : 'N/A'}</span>
+      </div>`;
+    });
+  }
+
+  if (past.length) {
+    html += '<p class="events-sub">Past Earnings</p>';
+    past.forEach(e => {
+      if (e.epsActual == null) return;
+      const surprise = e.epsEstimate != null ? e.epsActual - e.epsEstimate : null;
+      const beat = surprise == null ? null : surprise > 0.005 ? true : surprise < -0.005 ? false : null;
+      const badgeCls = beat === true ? 'ev-beat' : beat === false ? 'ev-miss' : 'ev-meet';
+      const badgeTxt = beat === true ? 'Beat' : beat === false ? 'Miss' : 'Meet';
+      const surpTxt  = surprise != null ? `${surprise >= 0 ? '+' : ''}$${fmt(surprise)}` : '';
+      const surpCol  = surprise == null ? '' : surprise > 0 ? '#2ecc71' : surprise < 0 ? '#e74c3c' : '#5aafd4';
+      html += `<div class="event-row">
+        <span class="event-date">${e.date}</span>
+        <span class="event-period">${e.period || ''} · Act $${fmt(e.epsActual)}</span>
+        <span class="event-badge ${badgeCls}">${badgeTxt}</span>
+        <span class="event-surprise" style="color:${surpCol}">${surpTxt}</span>
+      </div>`;
+    });
+  }
+
+  if (!html) {
+    c.innerHTML = '<p style="font-size:.72rem;color:rgba(204,224,239,.35)">No detailed earnings history available.</p>';
+    return;
+  }
+  c.innerHTML = html;
+}
+
+/* ── Strategy output ── */
+function calcStrategy(q, metrics) {
+  const m = metrics?.metric || {};
+  const action = calcAction(q, metrics);
+  const hi = m['52WeekHigh'], lo = m['52WeekLow'];
+  const price = q?.c;
+  const pe = m.peBasicExclExtraTTM;
+  const beta = m.beta;
+
+  let type, direction, risk, chipColor, chipBorder, note;
+
+  const pos = (hi && lo && price) ? (price - lo) / (hi - lo) * 100 : null;
+
+  /* Setup type */
+  if (pos != null && pos < 20)       type = 'Breakout Watch';
+  else if (pos != null && pos > 80)  type = 'Momentum Play';
+  else                               type = 'Range Trade';
+
+  /* Direction */
+  if (action.label === 'Strong Buy' || action.label === 'Buy')     direction = 'Bullish Bias';
+  else if (action.label === 'Caution' || action.label === 'Reduce') direction = 'Bearish Bias';
+  else                                                               direction = 'Neutral / Wait';
+
+  /* Risk */
+  if (beta != null && beta > 1.8)   risk = 'High Risk';
+  else if (beta != null && beta < 0.7) risk = 'Low Risk';
+  else                               risk = 'Moderate Risk';
+
+  /* Chip color */
+  if (direction === 'Bullish Bias')  { chipColor = 'rgba(39,174,96,.15)'; chipBorder = 'rgba(39,174,96,.35)'; }
+  else if (direction === 'Bearish Bias') { chipColor = 'rgba(231,76,60,.12)'; chipBorder = 'rgba(231,76,60,.3)'; }
+  else                               { chipColor = 'rgba(243,156,18,.1)'; chipBorder = 'rgba(243,156,18,.28)'; }
+
+  /* Trade note */
+  if (type === 'Breakout Watch') note = `Price near 52W low — watch for volume confirmation before entering. Stop below recent low.`;
+  else if (type === 'Momentum Play') note = `Extended near highs — momentum traders can trail stops; new entries require a pullback to reduce risk.`;
+  else note = `Range-bound — consider mean-reversion entries near support with defined risk to resistance.`;
+
+  return { type, direction, risk, chipColor, chipBorder, note };
+}
+
+function renderStrategy(strat) {
+  const row = $('strategyRow');
+  const chip = $('strategyChip');
+  const dir  = $('strategyDir');
+  const note = $('strategyNote');
+  chip.textContent = strat.type;
+  chip.style.background = strat.chipColor;
+  chip.style.border = `1px solid ${strat.chipBorder}`;
+  chip.style.color = '#cce0ef';
+  dir.textContent  = `${strat.direction} · ${strat.risk}`;
+  note.textContent = strat.note;
+  row.style.display = 'flex';
+}
+
 /* ── Load stock ── */
 async function loadStock(sym) {
   if (activeSym === sym) return;
@@ -474,15 +826,20 @@ async function loadStock(sym) {
   $('keyStats').innerHTML  = '<div class="d-skel" style="height:160px;margin:.25rem 0"></div>';
   $('actionBadge').textContent = '—'; $('actionList').innerHTML = '<li style="color:rgba(204,224,239,.3)">Loading…</li>';
   $('newsItems').innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.3);padding:.5rem 0">Loading…</p>';
+  $('insightRow').innerHTML = '<div class="insight-card d-skel" style="min-height:100px"></div>'.repeat(4);
+  $('keyQGrid').innerHTML  = '<div class="d-skel" style="height:120px;margin:.25rem 0"></div>';
+  $('eventsContent').innerHTML = '<div class="d-skel" style="height:80px;margin:.25rem 0"></div>';
+  $('strategyRow').style.display = 'none';
 
-  const [qR, pR, mR, nR] = await Promise.allSettled([
-    fetchQuote(sym), fetchProfile(sym), fetchMetrics(sym), fetchNews(sym)
+  const [qR, pR, mR, nR, eR] = await Promise.allSettled([
+    fetchQuote(sym), fetchProfile(sym), fetchMetrics(sym), fetchNews(sym), fetchEarnings(sym)
   ]);
 
   const q = qR.status==='fulfilled' ? qR.value  : null;
   const p = pR.status==='fulfilled' ? pR.value  : null;
   const m = mR.status==='fulfilled' ? mR.value  : null;
   const n = nR.status==='fulfilled' && Array.isArray(nR.value) ? nR.value : [];
+  const e = eR.status==='fulfilled' ? eR.value  : null;
 
   if (q) quoteCache[sym] = q;
 
@@ -492,6 +849,10 @@ async function loadStock(sym) {
   renderAction(calcAction(q, m));
   renderStats(q, m);
   renderNews(n);
+  renderInsights(generateInsights(q, m));
+  renderKeyQuestions(q, m, e);
+  renderEvents(e);
+  renderStrategy(calcStrategy(q, m));
 }
 
 /* ── Add ticker ── */
@@ -567,6 +928,8 @@ async function init() {
     } catch {}
   }
   setInterval(refreshWL, 60000);
+  loadMacroBar();
+  setInterval(loadMacroBar, 60000);
 }
 
 init();

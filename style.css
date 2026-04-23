@@ -1413,7 +1413,23 @@ body.dark-mode .footer-links a:hover { color: var(--sky); }
 .dark-page-wrap {
   padding-top: 70px;
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+/* Ticker tape sits at the very top, full width */
+.ticker-tape-outer {
+  width: 100%;
+  flex-shrink: 0;
+  background: #091627;
+  border-bottom: 1px solid rgba(90,175,212,.1);
+}
+
+/* Row containing sidebar + main */
+.dash-inner {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 /* ── Watchlist sidebar ── */
@@ -1423,8 +1439,8 @@ body.dark-mode .footer-links a:hover { color: var(--sky); }
   background: #0d1f33;
   border-right: 1px solid rgba(90,175,212,.1);
   position: sticky;
-  top: 70px;
-  height: calc(100vh - 70px);
+  top: 122px;
+  height: calc(100vh - 122px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1846,6 +1862,29 @@ body.dark-mode .footer-links a:hover { color: var(--sky); }
   overflow: hidden;
 }
 
+/* ── TradingView widget panels ── */
+.tv-widget-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin-bottom: 1.1rem;
+}
+
+@media (max-width: 860px) { .tv-widget-grid { grid-template-columns: 1fr; } }
+
+.tv-widget-panel {
+  background: #0d1f33;
+  border: 1px solid rgba(90,175,212,.1);
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+.tv-widget-panel .d-panel-title { margin-bottom: .85rem; }
+
+.tv-widget-container {
+  width: 100%;
+}
+
 /* ── Macro bar ── */
 .macro-bar {
   display: flex;
@@ -2120,7 +2159,7 @@ body.dark-mode .footer-links a:hover { color: var(--sky); }
 
 /* ── Dark dashboard responsive ── */
 @media (max-width: 960px) {
-  .dark-page-wrap { flex-direction: column; }
+  .dash-inner { flex-direction: column; }
   .wl-sidebar {
     width: 100%;
     height: auto;

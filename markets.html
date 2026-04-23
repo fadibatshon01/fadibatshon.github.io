@@ -48,6 +48,39 @@
   <!-- ░░ DASHBOARD ░░ -->
   <div class="dark-page-wrap">
 
+    <!-- Ticker tape — full width -->
+    <div class="ticker-tape-outer">
+      <div class="tradingview-widget-container" style="height:52px">
+        <div class="tradingview-widget-container__widget" style="height:52px"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+          "symbols": [
+            {"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},
+            {"proName":"FOREXCOM:NSXUSD","title":"Nasdaq 100"},
+            {"description":"Russell 2000","proName":"AMEX:IWM"},
+            {"description":"Apple","proName":"NASDAQ:AAPL"},
+            {"description":"NVIDIA","proName":"NASDAQ:NVDA"},
+            {"description":"Microsoft","proName":"NASDAQ:MSFT"},
+            {"description":"Amazon","proName":"NASDAQ:AMZN"},
+            {"description":"Tesla","proName":"NASDAQ:TSLA"},
+            {"description":"Meta","proName":"NASDAQ:META"},
+            {"description":"Bitcoin","proName":"BITSTAMP:BTCUSD"},
+            {"description":"Gold","proName":"OANDA:XAUUSD"},
+            {"description":"Crude Oil","proName":"NYMEX:CL1!"}
+          ],
+          "showSymbolLogo": true,
+          "isTransparent": true,
+          "displayMode": "adaptive",
+          "colorTheme": "dark",
+          "locale": "en"
+        }
+        </script>
+      </div>
+    </div>
+
+    <!-- Sidebar + main row -->
+    <div class="dash-inner">
+
     <!-- Watchlist sidebar -->
     <aside class="wl-sidebar">
       <div class="wl-top">
@@ -94,6 +127,18 @@
           <span>Interactive chart · RSI, MACD &amp; more available via the chart toolbar</span>
         </div>
         <div id="tvContainer" style="height:420px"></div>
+      </div>
+
+      <!-- TradingView Technical Analysis + Fundamental Data -->
+      <div class="tv-widget-grid">
+        <div class="tv-widget-panel">
+          <p class="d-panel-title">Technical Analysis</p>
+          <div class="tv-widget-container" id="techAnalysisContainer" style="height:425px"></div>
+        </div>
+        <div class="tv-widget-panel">
+          <p class="d-panel-title">Fundamental Data</p>
+          <div class="tv-widget-container" id="fundamentalsContainer" style="height:425px"></div>
+        </div>
       </div>
 
       <!-- Insight cards -->
@@ -186,7 +231,9 @@
 
       <p class="dash-disclaimer">For informational purposes only — not financial advice. Quotes via Finnhub · Chart via TradingView.</p>
     </main>
-  </div>
+
+    </div><!-- /.dash-inner -->
+  </div><!-- /.dark-page-wrap -->
 
   <!-- ░░ FOOTER ░░ -->
   <footer class="footer">
@@ -526,6 +573,39 @@ function renderWLItem(sym, q) {
   return isNew ? item : null;
 }
 
+/* ── TradingView embed widget loader ── */
+function loadTVEmbed(containerId, scriptSrc, config) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  const widgetDiv = document.createElement('div');
+  widgetDiv.className = 'tradingview-widget-container__widget';
+  widgetDiv.style.cssText = 'height:100%;width:100%';
+  container.appendChild(widgetDiv);
+  const s = document.createElement('script');
+  s.type = 'text/javascript';
+  s.src = scriptSrc;
+  s.async = true;
+  s.text = JSON.stringify(config);
+  container.appendChild(s);
+}
+
+function loadTechAnalysis(tvSymbol) {
+  loadTVEmbed('techAnalysisContainer',
+    'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js',
+    { interval: '1D', isTransparent: true, colorTheme: 'dark', symbol: tvSymbol,
+      showIntervalTabs: true, displayMode: 'single', locale: 'en', width: '100%', height: 400 }
+  );
+}
+
+function loadFundamentals(tvSymbol) {
+  loadTVEmbed('fundamentalsContainer',
+    'https://s3.tradingview.com/external-embedding/embed-widget-financials.js',
+    { isTransparent: true, displayMode: 'regular', colorTheme: 'dark',
+      symbol: tvSymbol, locale: 'en', width: '100%', height: 400 }
+  );
+}
+
 /* ── Fetch earnings ── */
 function fetchEarnings(sym) {
   const to   = new Date(Date.now() + 90*86400*1000).toISOString().split('T')[0];
@@ -826,6 +906,8 @@ async function loadStock(sym) {
   $('keyStats').innerHTML  = '<div class="d-skel" style="height:160px;margin:.25rem 0"></div>';
   $('actionBadge').textContent = '—'; $('actionList').innerHTML = '<li style="color:rgba(204,224,239,.3)">Loading…</li>';
   $('newsItems').innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.3);padding:.5rem 0">Loading…</p>';
+  $('techAnalysisContainer').innerHTML = '<div class="d-skel" style="height:100%;min-height:380px"></div>';
+  $('fundamentalsContainer').innerHTML  = '<div class="d-skel" style="height:100%;min-height:380px"></div>';
   $('insightRow').innerHTML = '<div class="insight-card d-skel" style="min-height:100px"></div>'.repeat(4);
   $('keyQGrid').innerHTML  = '<div class="d-skel" style="height:120px;margin:.25rem 0"></div>';
   $('eventsContent').innerHTML = '<div class="d-skel" style="height:80px;margin:.25rem 0"></div>';
@@ -844,7 +926,10 @@ async function loadStock(sym) {
   if (q) quoteCache[sym] = q;
 
   renderHeader(sym, q, p);
+  const tvSymbol = tvSym(sym, p?.exchange);
   loadTVChart(sym, p?.exchange);
+  loadTechAnalysis(tvSymbol);
+  loadFundamentals(tvSymbol);
   renderContext(q, m);
   renderAction(calcAction(q, m));
   renderStats(q, m);

@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg" />
-  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32.png" />
-  <link rel="icon" type="image/x-icon" href="favicons/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/svg+xml" href="../favicons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicons/favicon-32.png" />
+  <link rel="icon" type="image/x-icon" href="../favicons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../favicons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="dark-mode">
 
@@ -20,13 +20,13 @@
     <div class="nav-container">
       <a href="./" class="nav-logo">FB</a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="./index.html#about">About</a></li>
-        <li><a href="./index.html#projects">Projects</a></li>
-        <li><a href="./index.html#resume">Resume</a></li>
-        <li><a href="./index.html#contact">Contact</a></li>
-        <li><a href="./markets.html" class="active">Markets</a></li>
+        <li><a href="/#about">About</a></li>
+        <li><a href="/#projects">Projects</a></li>
+        <li><a href="/#resume">Resume</a></li>
+        <li><a href="/#contact">Contact</a></li>
+        <li><a href="/markets/" class="active">Markets</a></li>
       </ul>
-      <a href="./index.html#contact" class="btn-nav-cta">Let's Talk</a>
+      <a href="/#contact" class="btn-nav-cta">Let's Talk</a>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -36,12 +36,12 @@
   <!-- ░░ MOBILE MENU ░░ -->
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <ul>
-      <li><a href="./index.html#about"    class="mob-link">About</a></li>
-      <li><a href="./index.html#projects" class="mob-link">Projects</a></li>
-      <li><a href="./index.html#resume"   class="mob-link">Resume</a></li>
-      <li><a href="./index.html#contact"  class="mob-link">Contact</a></li>
-      <li><a href="./markets.html"        class="mob-link">Markets</a></li>
-      <li><a href="./index.html#contact"  class="mob-link btn-nav-cta">Let's Talk</a></li>
+      <li><a href="/#about"    class="mob-link">About</a></li>
+      <li><a href="/#projects" class="mob-link">Projects</a></li>
+      <li><a href="/#resume"   class="mob-link">Resume</a></li>
+      <li><a href="/#contact"  class="mob-link">Contact</a></li>
+      <li><a href="/markets/"        class="mob-link">Markets</a></li>
+      <li><a href="/#contact"  class="mob-link btn-nav-cta">Let's Talk</a></li>
     </ul>
   </div>
 
@@ -217,8 +217,12 @@
         <span class="footer-logo">FB</span>
         <p class="footer-copy">Fadi Batshon &nbsp;·&nbsp; La Jolla, CA</p>
         <div class="footer-links">
-          <a href="mailto:fbatshon@ucsd.edu">Email</a>
-          <a href="https://www.linkedin.com/in/fbatshon" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="mailto:fbatshon@ucsd.edu" aria-label="Email">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/fbatshon" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
         </div>
       </div>
     </div>

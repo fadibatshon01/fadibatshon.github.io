@@ -989,14 +989,15 @@ textarea { resize: none; }
 
 .footer-copy { font-size: .78rem; color: rgba(255,255,255,.45); }
 
-.footer-links { display: flex; gap: 1.5rem; }
+.footer-links { display: flex; gap: 1.25rem; align-items: center; }
 .footer-links a {
-  font-size: .78rem;
-  color: rgba(255,255,255,.45);
+  display: flex;
+  align-items: center;
+  color: var(--sky);
   text-decoration: none;
-  transition: color .2s;
+  transition: opacity .2s;
 }
-.footer-links a:hover { color: var(--sky); }
+.footer-links a:hover { opacity: .65; }
 
 /* ============================================================
    RESPONSIVE
@@ -1406,8 +1407,7 @@ body.dark-mode .nav-toggle span { background: #cce0ef; }
 body.dark-mode .mobile-menu     { background: #060f19; }
 body.dark-mode .footer          { background: #060f19; border-top-color: rgba(90,175,212,.18); }
 body.dark-mode .footer-copy,
-body.dark-mode .footer-links a  { color: rgba(204,224,239,.3); }
-body.dark-mode .footer-links a:hover { color: var(--sky); }
+body.dark-mode .footer-links a { color: var(--sky); }
 
 /* ── Layout ── */
 .dark-page-wrap {

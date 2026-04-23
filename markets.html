@@ -12,7 +12,6 @@
   <link rel="icon" type="image/x-icon" href="favicons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png" />
   <link rel="stylesheet" href="style.css" />
-  <script src="https://unpkg.com/lightweight-charts@4.0.1/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body class="dark-mode">
 
@@ -69,35 +68,32 @@
       <div class="stock-hdr">
         <div>
           <p class="hdr-sym" id="hdrSym">—</p>
-          <p class="hdr-name" id="hdrName">Select a stock</p>
+          <p class="hdr-name" id="hdrName">Select a ticker from your watchlist</p>
           <p class="hdr-exch" id="hdrExch"></p>
         </div>
         <div>
-          <p class="hdr-price" id="hdrPrice">—</p>
-          <p class="hdr-chg" id="hdrChg"></p>
+          <p class="hdr-price" id="hdrPrice"></p>
+          <p class="hdr-chg"   id="hdrChg"></p>
         </div>
       </div>
 
-      <!-- Chart -->
-      <div class="chart-panel">
-        <div class="chart-controls">
-          <button class="tf-btn" data-tf="7">1W</button>
-          <button class="tf-btn active" data-tf="30">1M</button>
-          <button class="tf-btn" data-tf="90">3M</button>
-          <button class="tf-btn" data-tf="365">1Y</button>
+      <!-- TradingView chart -->
+      <div class="chart-panel" id="chartPanel">
+        <div class="chart-tv-note">
+          <span>Interactive chart · RSI, MACD &amp; more available via the chart toolbar</span>
         </div>
-        <div id="priceChart"></div>
+        <div id="tvContainer" style="height:420px"></div>
       </div>
 
-      <!-- Analysis -->
+      <!-- Analysis grid -->
       <div class="analysis-grid">
         <div class="d-panel">
-          <p class="d-panel-title">Technical Signals</p>
-          <div id="sigRows"></div>
+          <p class="d-panel-title">Market Context</p>
+          <div id="sigRows"><div class="d-skel" style="height:160px;margin:.25rem 0"></div></div>
         </div>
         <div class="d-panel">
           <p class="d-panel-title">Key Statistics</p>
-          <div id="keyStats"></div>
+          <div id="keyStats"><div class="d-skel" style="height:160px;margin:.25rem 0"></div></div>
         </div>
       </div>
 
@@ -109,17 +105,19 @@
         </div>
         <div class="action-right">
           <p class="action-reasons-title">Contributing factors</p>
-          <ul class="action-reason-list" id="actionList"></ul>
+          <ul class="action-reason-list" id="actionList">
+            <li style="color:rgba(204,224,239,.3)">Loading analysis…</li>
+          </ul>
         </div>
       </div>
 
       <!-- News -->
       <div class="mini-news-panel">
         <p class="d-panel-title">Recent News</p>
-        <div id="newsItems"><p class="news-mini-time" style="padding:.5rem 0;opacity:.4">Loading…</p></div>
+        <div id="newsItems"><p style="font-size:.76rem;color:rgba(204,224,239,.3);padding:.5rem 0">Loading…</p></div>
       </div>
 
-      <p class="dash-disclaimer">For informational purposes only. Not financial advice. Data powered by Finnhub — prices may be delayed.</p>
+      <p class="dash-disclaimer">For informational purposes only — not financial advice. Quotes via Finnhub · Chart via TradingView.</p>
     </main>
   </div>
 
@@ -143,15 +141,32 @@
 const KEY  = 'd7kin01r01qiqbcuimsgd7kin01r01qiqbcuimt0';
 const BASE = 'https://finnhub.io/api/v1';
 const DEFAULT_WL = ['SPY','AAPL','AMZN','NVDA','TSLA'];
-const LS_KEY = 'fb_watchlist_v1';
+const LS_KEY = 'fb_watchlist_v2';
+
+/* Known TradingView symbol prefixes so the chart resolves instantly */
+const TV_MAP = {
+  SPY:'AMEX:SPY', QQQ:'NASDAQ:QQQ', DIA:'AMEX:DIA', IWM:'AMEX:IWM',
+  AAPL:'NASDAQ:AAPL', MSFT:'NASDAQ:MSFT', AMZN:'NASDAQ:AMZN', NVDA:'NASDAQ:NVDA',
+  TSLA:'NASDAQ:TSLA', GOOGL:'NASDAQ:GOOGL', GOOG:'NASDAQ:GOOG', META:'NASDAQ:META',
+  JPM:'NYSE:JPM', BAC:'NYSE:BAC', GS:'NYSE:GS', MS:'NYSE:MS', WFC:'NYSE:WFC',
+  V:'NYSE:V', MA:'NYSE:MA', JNJ:'NYSE:JNJ', WMT:'NYSE:WMT', XOM:'NYSE:XOM',
+  CVX:'NYSE:CVX', NFLX:'NASDAQ:NFLX', AMD:'NASDAQ:AMD', INTC:'NASDAQ:INTC',
+  PYPL:'NASDAQ:PYPL', UBER:'NYSE:UBER', SHOP:'NYSE:SHOP', COIN:'NASDAQ:COIN',
+};
+
+function tvSym(sym, exchangeName) {
+  if (TV_MAP[sym]) return TV_MAP[sym];
+  /* Fallback: parse Finnhub exchange name */
+  const e = (exchangeName || '').toUpperCase();
+  if (e.includes('NASDAQ')) return `NASDAQ:${sym}`;
+  if (e.includes('ARCA') || e === 'AMEX') return `AMEX:${sym}`;
+  if (e.includes('NEW YORK') || e.includes('NYSE')) return `NYSE:${sym}`;
+  return sym; /* TradingView will attempt auto-resolve */
+}
 
 /* ── State ── */
-let chart, candleSeries, volumeSeries;
-let allCandles   = [];
-let activeSym    = null;
-let activeTf     = 30;
-const quoteCache  = {};
-const candleCache = {};
+let activeSym = null;
+const quoteCache = {};
 
 /* ── DOM ── */
 const $ = id => document.getElementById(id);
@@ -175,169 +190,80 @@ function timeAgo(unix) {
   if (s < 86400) return `${Math.floor(s/3600)}h ago`;
   return `${Math.floor(s/86400)}d ago`;
 }
-function toDate(unix) {
-  return new Date(unix * 1000).toISOString().split('T')[0];
-}
 
 /* ── Watchlist storage ── */
 function getWL() {
-  try { const s = localStorage.getItem(LS_KEY); const a = s ? JSON.parse(s) : null; return Array.isArray(a) && a.length ? a : DEFAULT_WL; }
+  try { const a = JSON.parse(localStorage.getItem(LS_KEY)); return Array.isArray(a) && a.length ? a : DEFAULT_WL; }
   catch { return DEFAULT_WL; }
 }
-function saveWL(list) { localStorage.setItem(LS_KEY, JSON.stringify(list)); }
-function wlAdd(sym) { const l = getWL(); if (!l.includes(sym)) { l.push(sym); saveWL(l); } }
+function saveWL(l) { localStorage.setItem(LS_KEY, JSON.stringify(l)); }
+function wlAdd(sym)    { const l = getWL(); if (!l.includes(sym)) { l.push(sym); saveWL(l); } }
 function wlRemove(sym) { const l = getWL().filter(s => s !== sym); saveWL(l.length ? l : ['SPY']); }
 
 /* ── API ── */
-async function apiFetch(path) {
+async function api(path) {
   const r = await fetch(`${BASE}${path}&token=${KEY}`);
   if (!r.ok) throw new Error(r.status);
   return r.json();
 }
-const fetchQuote   = sym => apiFetch(`/quote?symbol=${sym}`);
-const fetchProfile = sym => apiFetch(`/stock/profile2?symbol=${sym}`);
-const fetchMetrics = sym => apiFetch(`/stock/metric?symbol=${sym}&metric=all`);
-function fetchCandles(sym) {
-  const to   = Math.floor(Date.now()/1000);
-  const from = to - 420 * 86400;
-  return apiFetch(`/stock/candle?symbol=${sym}&resolution=D&from=${from}&to=${to}`);
-}
-function fetchNews(sym) {
+const fetchQuote   = s => api(`/quote?symbol=${s}`);
+const fetchProfile = s => api(`/stock/profile2?symbol=${s}`);
+const fetchMetrics = s => api(`/stock/metric?symbol=${s}&metric=all`);
+function fetchNews(s) {
   const to   = new Date().toISOString().split('T')[0];
   const from = new Date(Date.now() - 7*86400*1000).toISOString().split('T')[0];
-  return apiFetch(`/company-news?symbol=${sym}&from=${from}&to=${to}`);
+  return api(`/company-news?symbol=${s}&from=${from}&to=${to}`);
 }
 
-/* ── Technical indicators ── */
-function sma(closes, n) {
-  if (closes.length < n) return null;
-  return closes.slice(-n).reduce((a,b) => a+b, 0) / n;
-}
-function emaArr(closes, n) {
-  if (closes.length < n) return [];
-  const k = 2/(n+1);
-  let e = closes.slice(0,n).reduce((a,b)=>a+b,0)/n;
-  const out = [e];
-  for (let i = n; i < closes.length; i++) { e = closes[i]*k + e*(1-k); out.push(e); }
-  return out;
-}
-function rsi14(closes) {
-  if (closes.length < 15) return null;
-  let ag = 0, al = 0;
-  for (let i = 1; i <= 14; i++) {
-    const d = closes[i] - closes[i-1];
-    if (d > 0) ag += d; else al -= d;
-  }
-  ag /= 14; al /= 14;
-  for (let i = 15; i < closes.length; i++) {
-    const d = closes[i] - closes[i-1];
-    ag = (ag*13 + (d > 0 ? d : 0)) / 14;
-    al = (al*13 + (d < 0 ? -d : 0)) / 14;
-  }
-  return al === 0 ? 100 : 100 - 100/(1 + ag/al);
-}
-function macd(closes) {
-  if (closes.length < 35) return null;
-  const e12 = emaArr(closes, 12);
-  const e26 = emaArr(closes, 26);
-  const len  = Math.min(e12.length, e26.length);
-  const line = Array.from({length: len}, (_,i) => e12[e12.length-len+i] - e26[e26.length-len+i]);
-  const sig  = emaArr(line, 9);
-  const lm   = line[line.length-1], ls = sig[sig.length-1];
-  const pm   = line[line.length-2], ps = sig[sig.length-2];
-  return {
-    val: lm, signal: ls,
-    bullish: lm > ls,
-    bullCross: pm < ps && lm > ls,
-    bearCross: pm > ps && lm < ls,
+/* ── TradingView chart ── */
+function loadTVChart(symbol, exchangeName) {
+  const sym = tvSym(symbol, exchangeName);
+  const container = $('tvContainer');
+  container.innerHTML = ''; /* clear previous widget */
+
+  const script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/tv.js';
+  script.onload = () => {
+    new TradingView.widget({
+      autosize: true,
+      symbol: sym,
+      interval: 'D',
+      timezone: 'America/New_York',
+      theme: 'dark',
+      style: '1',
+      locale: 'en',
+      toolbar_bg: '#0d1f33',
+      enable_publishing: false,
+      withdateranges: true,
+      hide_side_toolbar: false,
+      allow_symbol_change: false,
+      save_image: false,
+      studies: ['RSI@tv-basicstudies'],
+      container_id: 'tvContainer',
+    });
   };
-}
-function bollinger(closes, n=20) {
-  if (closes.length < n) return null;
-  const sl  = closes.slice(-n);
-  const mid = sl.reduce((a,b)=>a+b,0)/n;
-  const std = Math.sqrt(sl.reduce((s,c)=>s+(c-mid)**2,0)/n);
-  return { upper: mid+2*std, middle: mid, lower: mid-2*std, price: closes[closes.length-1] };
-}
-function signals(closes) {
-  return {
-    rsi:   rsi14(closes),
-    mac:   macd(closes),
-    s20:   sma(closes, 20),
-    s50:   sma(closes, 50),
-    s200:  sma(closes, 200),
-    bb:    bollinger(closes),
-    price: closes[closes.length-1],
-  };
-}
-function actionSignal(sig) {
-  const { rsi, mac, s20, s50, bb, price } = sig;
-  let score = 0;
-  const reasons = [];
-  if (rsi != null) {
-    if (rsi < 30)      { score += 2; reasons.push(`RSI ${fmt(rsi)} — deeply oversold, reversal candidate`); }
-    else if (rsi < 45) { score += 1; reasons.push(`RSI ${fmt(rsi)} — in buy territory`); }
-    else if (rsi > 70) { score -= 2; reasons.push(`RSI ${fmt(rsi)} — overbought, consider taking profits`); }
-    else if (rsi > 60) { score -= 1; reasons.push(`RSI ${fmt(rsi)} — approaching overbought`); }
-    else               { reasons.push(`RSI ${fmt(rsi)} — neutral range`); }
+  /* If tv.js already loaded, widget can be created immediately */
+  if (window.TradingView) {
+    new TradingView.widget({
+      autosize: true,
+      symbol: sym,
+      interval: 'D',
+      timezone: 'America/New_York',
+      theme: 'dark',
+      style: '1',
+      locale: 'en',
+      toolbar_bg: '#0d1f33',
+      enable_publishing: false,
+      withdateranges: true,
+      hide_side_toolbar: false,
+      allow_symbol_change: false,
+      save_image: false,
+      studies: ['RSI@tv-basicstudies'],
+      container_id: 'tvContainer',
+    });
+  } else {
+    document.head.appendChild(script);
   }
-  if (mac) {
-    if (mac.bullCross)  { score += 2; reasons.push('MACD bullish crossover — momentum turning positive'); }
-    else if (mac.bearCross) { score -= 2; reasons.push('MACD bearish crossover — momentum turning negative'); }
-    else if (mac.bullish) { score += 1; reasons.push('MACD above signal — upward momentum'); }
-    else                  { score -= 1; reasons.push('MACD below signal — downward momentum'); }
-  }
-  if (s20 && price) {
-    if (price > s20) { score += 0.5; reasons.push('Trading above SMA-20 — short-term trend bullish'); }
-    else             { score -= 0.5; reasons.push('Trading below SMA-20 — short-term trend bearish'); }
-  }
-  if (s50 && price) {
-    if (price > s50) { score += 0.5; reasons.push('Trading above SMA-50 — medium-term trend bullish'); }
-    else             { score -= 0.5; reasons.push('Trading below SMA-50 — medium-term trend bearish'); }
-  }
-  if (bb && price) {
-    if (price > bb.upper)      { score -= 1; reasons.push('Price above upper Bollinger Band — extended, possible pullback'); }
-    else if (price < bb.lower) { score += 1; reasons.push('Price below lower Bollinger Band — oversold, potential bounce'); }
-  }
-  let label, color, border;
-  if      (score >= 3.5)  { label = 'Strong Buy';  color = '#27ae60'; border = 'rgba(39,174,96,.35)'; }
-  else if (score >= 1.5)  { label = 'Buy';          color = '#2ecc71'; border = 'rgba(46,204,113,.32)'; }
-  else if (score >= -1)   { label = 'Hold';         color = '#f39c12'; border = 'rgba(243,156,18,.32)'; }
-  else if (score >= -2.5) { label = 'Caution';      color = '#e67e22'; border = 'rgba(230,126,34,.35)'; }
-  else                    { label = 'Strong Sell';  color = '#e74c3c'; border = 'rgba(231,76,60,.35)'; }
-  return { label, color, border, reasons };
-}
-
-/* ── Chart ── */
-function initChart() {
-  const el = $('priceChart');
-  chart = LightweightCharts.createChart(el, {
-    width:  el.clientWidth,
-    height: 360,
-    layout: { background: { type: 'Solid', color: '#0d1f33' }, textColor: 'rgba(204,224,239,.5)' },
-    grid:   { vertLines: { color: 'rgba(90,175,212,.05)' }, horzLines: { color: 'rgba(90,175,212,.05)' } },
-    crosshair: { mode: 1 },
-    rightPriceScale: { borderColor: 'rgba(90,175,212,.1)' },
-    timeScale: { borderColor: 'rgba(90,175,212,.1)', timeVisible: true, secondsVisible: false },
-  });
-  candleSeries = chart.addCandlestickSeries({
-    upColor: '#27ae60', downColor: '#e74c3c',
-    borderVisible: false, wickUpColor: '#27ae60', wickDownColor: '#e74c3c',
-  });
-  volumeSeries = chart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: 'vol' });
-  volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
-  window.addEventListener('resize', () => chart.applyOptions({ width: el.clientWidth }));
-}
-
-function applyChart(candles, tfDays) {
-  if (!chart || !candleSeries) return;
-  try {
-    const cut = new Date(Date.now() - tfDays*86400000).toISOString().split('T')[0];
-    const d   = candles.filter(c => c.time >= cut);
-    candleSeries.setData(d.map(c => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
-    if (volumeSeries) volumeSeries.setData(d.map(c => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(39,174,96,.3)' : 'rgba(231,76,60,.3)' })));
-    chart.timeScale().fitContent();
-  } catch(e) { console.warn('Chart render failed:', e); }
 }
 
 /* ── Render: header ── */
@@ -353,96 +279,161 @@ function renderHeader(sym, q, profile) {
   }
 }
 
-/* ── Render: signals ── */
-function renderSignals(sig) {
-  const { rsi, mac, s20, s50, s200, bb, price } = sig;
-  const rows = [];
+/* ── Render: market context (quote + metrics based) ── */
+function renderContext(q, metrics) {
+  const m = metrics?.metric || {};
+  const price = q?.c;
+  const rows  = [];
 
-  if (rsi != null) {
-    const [cls, lbl] = rsi < 30 ? ['s-green','Oversold'] : rsi > 70 ? ['s-red','Overbought'] : ['s-sky','Neutral'];
-    rows.push({ l: 'RSI-14', v: fmt(rsi), cls, b: lbl });
+  const hi = m['52WeekHigh'], lo = m['52WeekLow'];
+  if (hi && lo && price) {
+    const pos = (price - lo) / (hi - lo) * 100;
+    const [cls, lbl] = pos > 80 ? ['s-red','Near 52W High'] : pos < 20 ? ['s-green','Near 52W Low'] : ['s-sky','Mid Range'];
+    rows.push({ l: '52W Position', v: `${pos.toFixed(0)}%`, cls, b: lbl });
   }
-  if (mac) {
-    const lbl = mac.bullCross ? '↑ Bull Cross' : mac.bearCross ? '↓ Bear Cross' : mac.bullish ? 'Bullish' : 'Bearish';
-    rows.push({ l: 'MACD (12,26,9)', v: fmt(mac.val), cls: mac.bullish ? 's-green' : 's-red', b: lbl });
+
+  if (q?.dp != null) {
+    const up = q.dp >= 0, sign = up ? '+' : '';
+    const abs = Math.abs(q.dp);
+    const [cls, lbl] = abs > 2 ? [up?'s-green':'s-red', up?'Strong Day':'Heavy Selling'] : [up?'s-green':'s-red', up?'Positive':'Negative'];
+    rows.push({ l: 'Day Momentum', v: `${sign}${fmt(q.dp)}%`, cls, b: lbl });
   }
-  [[s20,'SMA-20'],[s50,'SMA-50'],[s200,'SMA-200']].forEach(([sv,sl]) => {
-    if (!sv) return;
-    const above = price > sv;
-    rows.push({ l: sl, v: `$${fmt(sv)}`, cls: above ? 's-green' : 's-red', b: above ? 'Above ↑' : 'Below ↓' });
-  });
-  if (bb) {
-    const [cls,lbl] = price > bb.upper ? ['s-red','Above Upper'] : price < bb.lower ? ['s-green','Below Lower'] : ['s-sky','Inside Band'];
-    rows.push({ l: 'Bollinger (20,2)', v: `$${fmt(bb.upper)} / $${fmt(bb.lower)}`, cls, b: lbl });
+
+  const pe = m.peBasicExclExtraTTM;
+  if (pe) {
+    const [cls, lbl] = pe < 0 ? ['s-yellow','Loss-making'] : pe < 15 ? ['s-green','Undervalued'] : pe < 30 ? ['s-sky','Fair Value'] : pe < 50 ? ['s-yellow','Premium'] : ['s-red','Highly Premium'];
+    rows.push({ l: 'P/E Ratio (TTM)', v: fmt(pe), cls, b: lbl });
+  }
+
+  const beta = m.beta;
+  if (beta != null) {
+    const [cls, lbl] = beta > 1.5 ? ['s-red','High Volatility'] : beta < 0.7 ? ['s-green','Defensive'] : ['s-sky','Market-like'];
+    rows.push({ l: 'Beta', v: fmt(beta), cls, b: lbl });
+  }
+
+  if (hi && price) {
+    const pct = (price - hi) / hi * 100;
+    const [cls, lbl] = pct > -5 ? ['s-red','At Peak'] : pct > -20 ? ['s-yellow','Near Peak'] : ['s-sky','Off Peak'];
+    rows.push({ l: 'vs 52W High', v: `${fmt(pct)}%`, cls, b: lbl });
+  }
+
+  const eps = m.epsBasicExclExtraItemsTTM;
+  if (eps != null) {
+    rows.push({ l: 'EPS (TTM)', v: `$${fmt(eps)}`, cls: eps > 0 ? 's-green' : 's-red', b: eps > 0 ? 'Profitable' : 'Unprofitable' });
   }
 
   const c = $('sigRows');
+  if (!rows.length) {
+    c.innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.35);padding:.5rem 0">No data available.</p>';
+    return;
+  }
   c.innerHTML = rows.map(r => `
     <div class="sig-row">
       <span class="sig-lbl">${r.l}</span>
       <span class="sig-val">${r.v}</span>
       <span class="sig-badge ${r.cls}">${r.b}</span>
     </div>`).join('');
-
-  if (rsi != null) {
-    const pct = Math.min(100, Math.max(0, rsi));
-    c.insertAdjacentHTML('beforeend', `
-      <div class="rsi-gauge">
-        <div class="rsi-track"><div class="rsi-needle" style="left:${pct}%"></div></div>
-        <div class="rsi-track-labels"><span>0</span><span>Oversold 30</span><span>Overbought 70</span><span>100</span></div>
-      </div>`);
-  }
 }
 
-/* ── Render: stats ── */
+/* ── Action signal (quote + metrics) ── */
+function calcAction(q, metrics) {
+  const m = metrics?.metric || {};
+  const price = q?.c;
+  let score = 0;
+  const reasons = [];
+
+  const hi = m['52WeekHigh'], lo = m['52WeekLow'];
+  if (hi && lo && price) {
+    const pos = (price - lo) / (hi - lo) * 100;
+    if (pos < 15)      { score += 2; reasons.push(`Price at ${pos.toFixed(0)}% of 52W range — deep value zone, historically low`); }
+    else if (pos < 35) { score += 1; reasons.push(`Price at ${pos.toFixed(0)}% of 52W range — approaching value territory`); }
+    else if (pos > 88) { score -= 2; reasons.push(`Price at ${pos.toFixed(0)}% of 52W range — near yearly peak, elevated risk`); }
+    else if (pos > 70) { score -= 1; reasons.push(`Price at ${pos.toFixed(0)}% of 52W range — extended, monitor for pullback`); }
+    else               { reasons.push(`Price at ${pos.toFixed(0)}% of 52W range — neutral positioning`); }
+  }
+
+  if (q?.dp != null) {
+    if      (q.dp >  3) { score += 1;   reasons.push(`Strong buying session (+${fmt(q.dp)}%) — institutional momentum`); }
+    else if (q.dp >  0) { score += 0.5; reasons.push(`Positive session (+${fmt(q.dp)}%) — mild upward pressure`); }
+    else if (q.dp < -3) { score -= 1;   reasons.push(`Heavy selling session (${fmt(q.dp)}%) — downward pressure`); }
+    else if (q.dp <  0) { score -= 0.5; reasons.push(`Negative session (${fmt(q.dp)}%) — mild selling pressure`); }
+  }
+
+  const pe = m.peBasicExclExtraTTM;
+  if (pe) {
+    if      (pe < 0)  { score -= 0.5; reasons.push(`Negative P/E (${fmt(pe)}) — company currently unprofitable`); }
+    else if (pe < 15) { score += 1;   reasons.push(`P/E ${fmt(pe)} — trading below historical market average, potential value`); }
+    else if (pe < 28) {               reasons.push(`P/E ${fmt(pe)} — fair valuation relative to market`); }
+    else if (pe < 50) { score -= 0.5; reasons.push(`P/E ${fmt(pe)} — premium valuation, growth already priced in`); }
+    else              { score -= 1;   reasons.push(`P/E ${fmt(pe)} — significant premium, requires strong growth to justify`); }
+  }
+
+  const beta = m.beta;
+  if (beta != null) {
+    if      (beta > 2)    { reasons.push(`High beta (${fmt(beta)}) — moves ${fmt(beta)}x the market, volatile`); }
+    else if (beta < 0.5)  { reasons.push(`Low beta (${fmt(beta)}) — defensive, less sensitive to market swings`); }
+  }
+
+  let label, color, border;
+  if      (score >= 2.5)  { label = 'Strong Buy'; color = '#27ae60'; border = 'rgba(39,174,96,.35)'; }
+  else if (score >= 1)    { label = 'Buy';         color = '#2ecc71'; border = 'rgba(46,204,113,.32)'; }
+  else if (score >= -0.5) { label = 'Hold';        color = '#f39c12'; border = 'rgba(243,156,18,.32)'; }
+  else if (score >= -2)   { label = 'Caution';     color = '#e67e22'; border = 'rgba(230,126,34,.35)'; }
+  else                    { label = 'Reduce';      color = '#e74c3c'; border = 'rgba(231,76,60,.35)'; }
+  return { label, color, border, reasons };
+}
+
+function renderAction(a) {
+  const el = $('actionBadge');
+  el.textContent = a.label;
+  el.style.color = a.color;
+  el.style.borderColor = a.border;
+  el.style.background  = a.border.replace(/[\d.]+\)$/, '0.08)');
+  $('actionList').innerHTML = a.reasons.map(r => `<li>${r}</li>`).join('');
+}
+
+/* ── Render: key stats ── */
 function renderStats(q, metrics) {
   const m = metrics?.metric || {};
   const rows = [
-    ['Price',       q?.c  ? `$${fmt(q.c)}`  : '—'],
-    ['Open',        q?.o  ? `$${fmt(q.o)}`  : '—'],
-    ['Day High',    q?.h  ? `$${fmt(q.h)}`  : '—'],
-    ['Day Low',     q?.l  ? `$${fmt(q.l)}`  : '—'],
-    ['52W High',    m['52WeekHigh'] ? `$${fmt(m['52WeekHigh'])}` : '—'],
-    ['52W Low',     m['52WeekLow']  ? `$${fmt(m['52WeekLow'])}` : '—'],
-    ['P/E (TTM)',   m.peBasicExclExtraTTM ? fmt(m.peBasicExclExtraTTM) : '—'],
-    ['EPS (TTM)',   m.epsBasicExclExtraItemsTTM ? `$${fmt(m.epsBasicExclExtraItemsTTM)}` : '—'],
-    ['Market Cap',  m.marketCapitalization ? fmtM(m.marketCapitalization) : '—'],
-    ['Beta',        m.beta ? fmt(m.beta) : '—'],
+    ['Open',       q?.o  ? `$${fmt(q.o)}` : '—'],
+    ['Day High',   q?.h  ? `$${fmt(q.h)}` : '—'],
+    ['Day Low',    q?.l  ? `$${fmt(q.l)}` : '—'],
+    ['Prev Close', q?.pc ? `$${fmt(q.pc)}`: '—'],
+    ['52W High',   m['52WeekHigh'] ? `$${fmt(m['52WeekHigh'])}` : '—'],
+    ['52W Low',    m['52WeekLow']  ? `$${fmt(m['52WeekLow'])}` : '—'],
+    ['P/E (TTM)',  m.peBasicExclExtraTTM ? fmt(m.peBasicExclExtraTTM) : '—'],
+    ['EPS (TTM)',  m.epsBasicExclExtraItemsTTM ? `$${fmt(m.epsBasicExclExtraItemsTTM)}` : '—'],
+    ['Market Cap', m.marketCapitalization ? fmtM(m.marketCapitalization) : '—'],
+    ['Beta',       m.beta ? fmt(m.beta) : '—'],
   ];
   $('keyStats').innerHTML = rows.map(([l,v]) =>
     `<div class="stat-row"><span class="stat-lbl">${l}</span><span class="stat-val">${v}</span></div>`
   ).join('');
 }
 
-/* ── Render: action ── */
-function renderAction(a) {
-  const el = $('actionBadge');
-  el.textContent  = a.label;
-  el.style.color  = a.color;
-  el.style.borderColor = a.border;
-  el.style.background  = a.border.replace('.35','.08').replace('.32','.08');
-  $('actionList').innerHTML = a.reasons.map(r => `<li>${r}</li>`).join('');
-}
-
 /* ── Render: news ── */
 function renderNews(articles) {
   const c = $('newsItems');
-  if (!articles?.length) { c.innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.35);padding:.5rem 0">No recent news.</p>'; return; }
+  if (!articles?.length) {
+    c.innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.35);padding:.5rem 0">No recent news.</p>';
+    return;
+  }
   c.innerHTML = '';
-  articles.slice(0, 5).forEach(a => {
+  articles.slice(0,5).forEach(a => {
     const el = document.createElement('a');
-    el.href = a.url || '#'; el.target = '_blank'; el.rel = 'noopener noreferrer';
+    el.href = a.url||'#'; el.target='_blank'; el.rel='noopener noreferrer';
     el.className = 'news-mini-item';
     const meta = document.createElement('div'); meta.className = 'news-mini-meta';
-    const src = document.createElement('span');  src.className = 'news-mini-src';  src.textContent = a.source || '';
-    const t   = document.createElement('span');  t.className   = 'news-mini-time'; t.textContent   = timeAgo(a.datetime);
-    const hl  = document.createElement('p');     hl.className  = 'news-mini-hl';   hl.textContent  = a.headline || '';
-    meta.append(src, t); el.append(meta, hl); c.appendChild(el);
+    const src  = document.createElement('span'); src.className  = 'news-mini-src';  src.textContent = a.source||'';
+    const t    = document.createElement('span'); t.className    = 'news-mini-time'; t.textContent   = timeAgo(a.datetime);
+    const hl   = document.createElement('p');    hl.className   = 'news-mini-hl';   hl.textContent  = a.headline||'';
+    meta.append(src,t); el.append(meta,hl); c.appendChild(el);
   });
 }
 
 /* ── Watchlist items ── */
-function renderWLItem(sym, q, rsiVal) {
+function renderWLItem(sym, q) {
   let item = $(`wli-${sym}`);
   const isNew = !item;
   if (isNew) {
@@ -450,11 +441,7 @@ function renderWLItem(sym, q, rsiVal) {
     item.className = 'wl-item'; item.id = `wli-${sym}`;
     item.addEventListener('click', () => loadStock(sym));
   }
-  const up   = q && q.d >= 0, sign = up ? '+' : '';
-  const rsiNum = rsiVal != null ? Math.round(rsiVal) : null;
-  const [rCls, rLbl] = rsiNum == null ? ['rsi-nt','—'] :
-    rsiNum < 30 ? ['rsi-os','Oversold'] : rsiNum > 70 ? ['rsi-ob','Overbought'] : ['rsi-nt','Neutral'];
-
+  const up = q && q.d >= 0, sign = up ? '+' : '';
   item.innerHTML = `
     <div class="wl-item-top">
       <span class="wl-symbol">${sym}</span>
@@ -462,14 +449,11 @@ function renderWLItem(sym, q, rsiVal) {
     </div>
     <div class="wl-item-mid">
       <span class="wl-price">${q?.c ? '$'+fmt(q.c) : '—'}</span>
-      <span class="wl-chg ${up ? 'mkt-up':'mkt-down'}">${q?.dp != null ? sign+fmt(q.dp)+'%' : ''}</span>
-    </div>
-    ${rsiNum != null ? `<span class="wl-rsi ${rCls}">RSI ${rsiNum} · ${rLbl}</span>` : ''}`;
-
+      <span class="wl-chg ${up?'mkt-up':'mkt-down'}">${q?.dp!=null ? sign+fmt(q.dp)+'%' : ''}</span>
+    </div>`;
   item.querySelector('.wl-rm').onclick = e => {
     e.stopPropagation();
-    wlRemove(sym);
-    item.remove();
+    wlRemove(sym); item.remove();
     if (activeSym === sym) { const l = getWL(); if (l.length) loadStock(l[0]); }
   };
   return isNew ? item : null;
@@ -483,47 +467,29 @@ async function loadStock(sym) {
   document.querySelectorAll('.wl-item').forEach(el => el.classList.remove('active'));
   $(`wli-${sym}`)?.classList.add('active');
 
-  $('hdrSym').textContent = sym; $('hdrName').textContent = 'Loading…';
+  $('hdrSym').textContent  = sym;
+  $('hdrName').textContent = 'Loading…';
   $('hdrExch').textContent = $('hdrPrice').textContent = $('hdrChg').textContent = '';
-  $('sigRows').innerHTML  = '<div class="d-skel" style="height:180px;margin:.5rem 0"></div>';
-  $('keyStats').innerHTML = '<div class="d-skel" style="height:180px;margin:.5rem 0"></div>';
-  $('actionBadge').textContent = '—'; $('actionList').innerHTML = '';
+  $('sigRows').innerHTML   = '<div class="d-skel" style="height:160px;margin:.25rem 0"></div>';
+  $('keyStats').innerHTML  = '<div class="d-skel" style="height:160px;margin:.25rem 0"></div>';
+  $('actionBadge').textContent = '—'; $('actionList').innerHTML = '<li style="color:rgba(204,224,239,.3)">Loading…</li>';
   $('newsItems').innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.3);padding:.5rem 0">Loading…</p>';
 
-  const [qR, crR, pR, mR, nR] = await Promise.allSettled([
-    fetchQuote(sym), fetchCandles(sym), fetchProfile(sym), fetchMetrics(sym), fetchNews(sym)
+  const [qR, pR, mR, nR] = await Promise.allSettled([
+    fetchQuote(sym), fetchProfile(sym), fetchMetrics(sym), fetchNews(sym)
   ]);
 
-  const q   = qR.status  === 'fulfilled' ? qR.value  : null;
-  const cr  = crR.status === 'fulfilled' ? crR.value : null;
-  const p   = pR.status  === 'fulfilled' ? pR.value  : null;
-  const m   = mR.status  === 'fulfilled' ? mR.value  : null;
-  const n   = nR.status  === 'fulfilled' && Array.isArray(nR.value) ? nR.value : [];
+  const q = qR.status==='fulfilled' ? qR.value  : null;
+  const p = pR.status==='fulfilled' ? pR.value  : null;
+  const m = mR.status==='fulfilled' ? mR.value  : null;
+  const n = nR.status==='fulfilled' && Array.isArray(nR.value) ? nR.value : [];
 
   if (q) quoteCache[sym] = q;
 
-  let candles = [];
-  if (cr?.s === 'ok' && cr.t) {
-    candles = cr.t.map((ts,i) => ({ time: toDate(ts), open: cr.o[i], high: cr.h[i], low: cr.l[i], close: cr.c[i], volume: cr.v[i] }));
-    candleCache[sym] = candles;
-  }
-
   renderHeader(sym, q, p);
-
-  if (candles.length) {
-    allCandles = candles;
-    applyChart(candles, activeTf);
-    const closes = candles.map(c => c.close);
-    const sig = signals(closes);
-    renderSignals(sig);
-    renderAction(actionSignal(sig));
-    const rsiVal = sig.rsi;
-    if (rsiVal != null) { renderWLItem(sym, q, rsiVal); $(`wli-${sym}`)?.classList.add('active'); }
-  } else {
-    $('sigRows').innerHTML = '<p style="font-size:.76rem;color:rgba(204,224,239,.3);padding:.5rem 0">No candle data available.</p>';
-    renderAction({ label: '—', color: 'var(--sky)', border: 'rgba(90,175,212,.3)', reasons: ['Insufficient data'] });
-  }
-
+  loadTVChart(sym, p?.exchange);
+  renderContext(q, m);
+  renderAction(calcAction(q, m));
   renderStats(q, m);
   renderNews(n);
 }
@@ -533,15 +499,14 @@ async function addTicker() {
   const input = $('wlInput');
   const sym = input.value.trim().toUpperCase().replace(/[^A-Z.]/g,'').slice(0,6);
   if (!sym) return;
-  const list = getWL();
-  if (list.includes(sym)) { $('wlErr').textContent = 'Already in watchlist'; return; }
+  if (getWL().includes(sym)) { $('wlErr').textContent = 'Already in watchlist'; return; }
   $('wlErr').textContent = '';
   $('wlAddBtn').disabled = input.disabled = true;
   try {
     const q = await fetchQuote(sym);
     if (!q?.c) { $('wlErr').textContent = 'Ticker not found'; return; }
     wlAdd(sym); quoteCache[sym] = q;
-    const el = renderWLItem(sym, q, null);
+    const el = renderWLItem(sym, q);
     $('wlList').appendChild(el);
     input.value = '';
     loadStock(sym);
@@ -555,10 +520,9 @@ async function refreshWL() {
     try {
       const q = await fetchQuote(sym);
       quoteCache[sym] = q;
-      const rsiVal = candleCache[sym] ? rsi14(candleCache[sym].map(c=>c.close)) : null;
-      renderWLItem(sym, q, rsiVal);
+      renderWLItem(sym, q);
       if (sym === activeSym) $(`wli-${sym}`)?.classList.add('active');
-    } catch { /* silent */ }
+    } catch {}
   }
 }
 
@@ -586,22 +550,11 @@ navToggle.addEventListener('click', () => menuOpen ? closeMenu() : openMenu());
 document.querySelectorAll('.mob-link').forEach(l => l.addEventListener('click', closeMenu));
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && menuOpen) closeMenu(); });
 
-/* ── Timeframe buttons ── */
-document.querySelectorAll('.tf-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeTf = parseInt(btn.dataset.tf);
-    if (allCandles.length) applyChart(allCandles, activeTf);
-  });
-});
-
 /* ── Init ── */
 async function init() {
-  try { initChart(); } catch(e) { console.warn('Chart init failed:', e); $('priceChart').style.display = 'none'; }
-  const list = getWL();
-  const wlEl = $('wlList');
-  list.forEach(sym => { const el = renderWLItem(sym, null, null); wlEl.appendChild(el); });
+  const list  = getWL();
+  const wlEl  = $('wlList');
+  list.forEach(sym => { const el = renderWLItem(sym, null); wlEl.appendChild(el); });
   $('wlAddBtn').addEventListener('click', addTicker);
   $('wlInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTicker(); });
   loadStock(list[0]);
@@ -609,9 +562,9 @@ async function init() {
     try {
       const q = await fetchQuote(sym);
       quoteCache[sym] = q;
-      renderWLItem(sym, q, candleCache[sym] ? rsi14(candleCache[sym].map(c=>c.close)) : null);
+      renderWLItem(sym, q);
       if (sym === activeSym) $(`wli-${sym}`)?.classList.add('active');
-    } catch { /* silent */ }
+    } catch {}
   }
   setInterval(refreshWL, 60000);
 }

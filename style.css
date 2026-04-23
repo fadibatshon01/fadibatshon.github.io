@@ -1610,6 +1610,14 @@ body.dark-mode .footer-links a:hover { color: var(--sky); }
   overflow: hidden;
 }
 
+.chart-tv-note {
+  padding: .55rem 1rem;
+  border-bottom: 1px solid rgba(90,175,212,.07);
+  font-size: .62rem;
+  color: rgba(204,224,239,.3);
+  letter-spacing: .05em;
+}
+
 .chart-controls {
   display: flex;
   align-items: center;

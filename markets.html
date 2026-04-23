@@ -48,39 +48,6 @@
   <!-- ░░ DASHBOARD ░░ -->
   <div class="dark-page-wrap">
 
-    <!-- Ticker tape — full width -->
-    <div class="ticker-tape-outer">
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-        {
-          "symbols": [
-            {"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},
-            {"proName":"FOREXCOM:NSXUSD","title":"Nasdaq 100"},
-            {"description":"Russell 2000","proName":"AMEX:IWM"},
-            {"description":"Apple","proName":"NASDAQ:AAPL"},
-            {"description":"NVIDIA","proName":"NASDAQ:NVDA"},
-            {"description":"Microsoft","proName":"NASDAQ:MSFT"},
-            {"description":"Amazon","proName":"NASDAQ:AMZN"},
-            {"description":"Tesla","proName":"NASDAQ:TSLA"},
-            {"description":"Meta","proName":"NASDAQ:META"},
-            {"description":"Bitcoin","proName":"BITSTAMP:BTCUSD"},
-            {"description":"Gold","proName":"OANDA:XAUUSD"},
-            {"description":"Crude Oil","proName":"NYMEX:CL1!"}
-          ],
-          "showSymbolLogo": true,
-          "isTransparent": false,
-          "displayMode": "adaptive",
-          "colorTheme": "dark",
-          "locale": "en"
-        }
-        </script>
-      </div>
-    </div>
-
-    <!-- Sidebar + main row -->
-    <div class="dash-inner">
-
     <!-- Watchlist sidebar -->
     <aside class="wl-sidebar">
       <div class="wl-top">
@@ -96,6 +63,36 @@
 
     <!-- Main panel -->
     <main class="dash-main">
+
+      <!-- Ticker tape — sticky inside dash-main, never overlaps sidebar -->
+      <div class="ticker-tape-outer">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+          {
+            "symbols": [
+              {"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},
+              {"proName":"FOREXCOM:NSXUSD","title":"Nasdaq 100"},
+              {"description":"Russell 2000","proName":"AMEX:IWM"},
+              {"description":"Apple","proName":"NASDAQ:AAPL"},
+              {"description":"NVIDIA","proName":"NASDAQ:NVDA"},
+              {"description":"Microsoft","proName":"NASDAQ:MSFT"},
+              {"description":"Amazon","proName":"NASDAQ:AMZN"},
+              {"description":"Tesla","proName":"NASDAQ:TSLA"},
+              {"description":"Meta","proName":"NASDAQ:META"},
+              {"description":"Bitcoin","proName":"BITSTAMP:BTCUSD"},
+              {"description":"Gold","proName":"OANDA:XAUUSD"},
+              {"description":"Crude Oil","proName":"NYMEX:CL1!"}
+            ],
+            "showSymbolLogo": true,
+            "isTransparent": false,
+            "displayMode": "adaptive",
+            "colorTheme": "dark",
+            "locale": "en"
+          }
+          </script>
+        </div>
+      </div>
 
       <!-- Stock header -->
       <div class="stock-hdr">
@@ -211,7 +208,6 @@
       <p class="dash-disclaimer">For informational purposes only — not financial advice. Quotes via Finnhub · Chart via TradingView.</p>
     </main>
 
-    </div><!-- /.dash-inner -->
   </div><!-- /.dark-page-wrap -->
 
   <!-- ░░ FOOTER ░░ -->

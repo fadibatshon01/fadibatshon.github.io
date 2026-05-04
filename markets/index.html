@@ -120,10 +120,7 @@
 
       <!-- TradingView chart -->
       <div class="chart-panel" id="chartPanel">
-        <div class="chart-tv-note">
-          <span>Interactive chart · RSI, MACD &amp; more available via the chart toolbar</span>
-        </div>
-        <div id="tvContainer" style="height:420px"></div>
+        <div id="tvContainer" style="height:460px"></div>
       </div>
 
       <!-- Insight cards -->
@@ -553,7 +550,7 @@ function loadTVEmbed(containerId, scriptSrc, config) {
   widgetDiv.style.cssText = 'height:100%;width:100%';
   container.appendChild(widgetDiv);
   const s = document.createElement('script');
-  s.type = 'application/json';
+  s.type = 'text/javascript';
   s.src = scriptSrc;
   s.async = true;
   s.text = JSON.stringify(config);
@@ -658,7 +655,7 @@ function renderInsights(insights) {
   const c = $('insightRow');
   if (!insights.length) { c.innerHTML = ''; return; }
   c.innerHTML = insights.map(ins => `
-    <div class="insight-card">
+    <div class="insight-card ic-${ins.confCls}">
       <span class="insight-type">${ins.type}</span>
       <p class="insight-text">${ins.text}</p>
       <div class="conf-track"><div class="conf-fill ${ins.confCls}" style="width:${ins.confidence.toFixed(0)}%"></div></div>

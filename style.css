@@ -1444,8 +1444,8 @@ body.dark-mode .footer-links a { color: var(--sky); }
 .wl-sidebar::-webkit-scrollbar-thumb { background: rgba(90,175,212,.2); border-radius: 2px; }
 
 .wl-top {
-  padding: 1.4rem 1.1rem 1rem;
-  border-bottom: 1px solid rgba(90,175,212,.08);
+  padding: 1.5rem 1.2rem 1.1rem;
+  border-bottom: 1px solid rgba(90,175,212,.1);
   flex-shrink: 0;
 }
 
@@ -1573,7 +1573,9 @@ body.dark-mode .footer-links a { color: var(--sky); }
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(90,175,212,.08);
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -1616,8 +1618,8 @@ body.dark-mode .footer-links a { color: var(--sky); }
 /* ── Chart panel ── */
 .chart-panel {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  margin-bottom: 1.1rem;
+  border: 1px solid rgba(90,175,212,.13);
+  margin-bottom: 1.5rem;
   overflow: hidden;
 }
 
@@ -1660,13 +1662,13 @@ body.dark-mode .footer-links a { color: var(--sky); }
   display: grid;
   grid-template-columns: 1.1fr 1fr;
   gap: 1.1rem;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.5rem;
 }
 
 .d-panel {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  padding: 1.25rem;
+  border: 1px solid rgba(90,175,212,.13);
+  padding: 1.35rem;
 }
 
 .d-panel-title {
@@ -1676,6 +1678,8 @@ body.dark-mode .footer-links a { color: var(--sky); }
   color: var(--sky);
   font-weight: 700;
   margin-bottom: 1rem;
+  border-left: 2px solid var(--sky);
+  padding-left: .6rem;
 }
 
 /* ── Signal rows ── */
@@ -1819,8 +1823,8 @@ body.dark-mode .footer-links a { color: var(--sky); }
 /* ── Mini news ── */
 .mini-news-panel {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  padding: 1.25rem;
+  border: 1px solid rgba(90,175,212,.13);
+  padding: 1.35rem;
 }
 
 .news-mini-item {
@@ -1861,16 +1865,16 @@ body.dark-mode .footer-links a { color: var(--sky); }
 .tv-widget-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: .75rem;
-  margin-bottom: 1.1rem;
+  gap: .85rem;
+  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 860px) { .tv-widget-grid { grid-template-columns: 1fr; } }
 
 .tv-widget-panel {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  padding: 1.25rem;
+  border: 1px solid rgba(90,175,212,.13);
+  padding: 1.35rem;
   overflow: hidden;
 }
 
@@ -1886,9 +1890,9 @@ body.dark-mode .footer-links a { color: var(--sky); }
   align-items: center;
   gap: 1rem;
   background: rgba(13,31,51,.7);
-  border: 1px solid rgba(90,175,212,.1);
+  border: 1px solid rgba(90,175,212,.13);
   border-bottom: none;
-  padding: .55rem 1.1rem;
+  padding: .6rem 1.2rem;
   flex-wrap: wrap;
 }
 
@@ -1942,8 +1946,8 @@ body.dark-mode .footer-links a { color: var(--sky); }
 .insight-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: .75rem;
-  margin-bottom: 1.1rem;
+  gap: .85rem;
+  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 900px) { .insight-row { grid-template-columns: repeat(2, 1fr); } }
@@ -1951,11 +1955,11 @@ body.dark-mode .footer-links a { color: var(--sky); }
 
 .insight-card {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  padding: .9rem 1rem;
+  border: 1px solid rgba(90,175,212,.13);
+  padding: 1rem 1.1rem;
   display: flex;
   flex-direction: column;
-  gap: .45rem;
+  gap: .5rem;
 }
 
 .insight-type {
@@ -2006,9 +2010,9 @@ body.dark-mode .footer-links a { color: var(--sky); }
 /* ── Key questions ── */
 .kq-panel {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  padding: 1.25rem;
-  margin-bottom: 1.1rem;
+  border: 1px solid rgba(90,175,212,.13);
+  padding: 1.35rem;
+  margin-bottom: 1.5rem;
 }
 
 .kq-grid { display: flex; flex-direction: column; gap: 0; }
@@ -2047,9 +2051,9 @@ body.dark-mode .footer-links a { color: var(--sky); }
 /* ── Events & Catalysts ── */
 .events-panel {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  padding: 1.25rem;
-  margin-bottom: 1.1rem;
+  border: 1px solid rgba(90,175,212,.13);
+  padding: 1.35rem;
+  margin-bottom: 1.5rem;
 }
 
 .events-sub { font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: rgba(204,224,239,.35); margin: .9rem 0 .45rem; }
@@ -2127,9 +2131,9 @@ body.dark-mode .footer-links a { color: var(--sky); }
 /* ── Heatmap panel ── */
 .heatmap-panel {
   background: #0d1f33;
-  border: 1px solid rgba(90,175,212,.1);
-  padding: 1.25rem;
-  margin-bottom: 1.1rem;
+  border: 1px solid rgba(90,175,212,.13);
+  padding: 1.35rem;
+  margin-bottom: 1.5rem;
 }
 
 .heatmap-panel .d-panel-title { margin-bottom: .85rem; }

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Bottom Line — Fadi Batshon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="../favicons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicons/favicon-32.png" />
+  <link rel="icon" type="image/x-icon" href="../favicons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../favicons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body class="writing-body">
+
+  <!-- ░░ NAVBAR ░░ -->
+  <nav class="navbar navbar-solid" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">FB</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#projects">Projects</a></li>
+        <li><a href="../index.html#resume">Resume</a></li>
+        <li><a href="./" class="active">Writing</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+      <a href="../index.html#contact" class="btn-nav-cta">Let's Talk</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ░░ MOBILE MENU ░░ -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <ul>
+      <li><a href="../index.html#about"    class="mob-link">About</a></li>
+      <li><a href="../index.html#projects" class="mob-link">Projects</a></li>
+      <li><a href="../index.html#resume"   class="mob-link">Resume</a></li>
+      <li><a href="./"                     class="mob-link">Writing</a></li>
+      <li><a href="../index.html#contact"  class="mob-link">Contact</a></li>
+      <li><a href="../index.html#contact"  class="mob-link btn-nav-cta">Let's Talk</a></li>
+    </ul>
+  </div>
+
+  <!-- ░░ POST ░░ -->
+  <article class="post-wrap">
+    <div class="post-container">
+      <a href="./" class="post-back"><span aria-hidden="true">←</span> All writing</a>
+
+      <header class="post-head" id="postHead">
+        <p class="post-meta" id="postMeta"></p>
+        <h1 class="post-title" id="postTitle">Loading…</h1>
+      </header>
+
+      <div id="postBody" class="post-body">
+        <p class="post-loading">Loading post…</p>
+      </div>
+
+      <footer class="post-foot">
+        <a href="./" class="post-back"><span aria-hidden="true">←</span> Back to all writing</a>
+      </footer>
+    </div>
+  </article>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-logo">FB</span>
+        <p class="footer-copy">Fadi Batshon &nbsp;·&nbsp; La Jolla, CA</p>
+        <div class="footer-links">
+          <a href="mailto:fbatshon@ucsd.edu" aria-label="Email">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/fbatshon" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script>
+    (async function () {
+      const params = new URLSearchParams(window.location.search);
+      const slug = (params.get('slug') || '').replace(/[^a-z0-9-_]/gi, '');
+      const titleEl = document.getElementById('postTitle');
+      const metaEl  = document.getElementById('postMeta');
+      const bodyEl  = document.getElementById('postBody');
+
+      if (!slug) {
+        titleEl.textContent = 'Post not found';
+        bodyEl.innerHTML = '<p>No post slug provided. <a href="./">Back to all writing</a>.</p>';
+        return;
+      }
+
+      try {
+        const manifestRes = await fetch('./posts.json', { cache: 'no-cache' });
+        if (!manifestRes.ok) throw new Error('posts.json unavailable');
+        const posts = await manifestRes.json();
+        const meta = posts.find(p => p.slug === slug);
+        if (!meta) {
+          titleEl.textContent = 'Post not found';
+          bodyEl.innerHTML = '<p>That post doesn\'t exist. <a href="./">Back to all writing</a>.</p>';
+          return;
+        }
+
+        const mdRes = await fetch(`./posts/${slug}.md`, { cache: 'no-cache' });
+        if (!mdRes.ok) throw new Error('post file unavailable');
+        const md = await mdRes.text();
+
+        const fmtDate = (iso) => {
+          const d = new Date(iso + 'T00:00:00');
+          if (isNaN(d)) return iso;
+          return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        };
+
+        const stripFirstH1 = (s) => s.replace(/^\s*#\s+.+\n+/, '');
+        const html = marked.parse(stripFirstH1(md));
+
+        document.title = `${meta.title} — The Bottom Line`;
+        titleEl.textContent = meta.title;
+        const tagBits = (meta.tags || []).map(t => `<span class="post-tag">${t}</span>`).join('');
+        metaEl.innerHTML = `<time datetime="${meta.date}">${fmtDate(meta.date)}</time>${tagBits ? ' &nbsp;·&nbsp; ' + tagBits : ''}`;
+        bodyEl.innerHTML = html;
+      } catch (err) {
+        titleEl.textContent = 'Couldn\'t load post';
+        bodyEl.innerHTML = `<p>Something went wrong. If you're viewing this from a <code>file://</code> URL, run a local server (e.g. <code>python3 -m http.server</code>).</p>`;
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>

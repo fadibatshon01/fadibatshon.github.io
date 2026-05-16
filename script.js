@@ -103,14 +103,15 @@ const formNote    = document.getElementById('formNote');
    ─────────────────────────────────────────────────────────── */
 const FORMSPREE_ID = 'mjgjapyz';
 
-contactForm.addEventListener('submit', async e => {
+if (contactForm) contactForm.addEventListener('submit', async e => {
   e.preventDefault();
 
-  const name  = document.getElementById('fname').value.trim();
-  const email = document.getElementById('femail').value.trim();
-  const msg   = document.getElementById('fmsg').value.trim();
+  const name    = document.getElementById('fname').value.trim();
+  const email   = document.getElementById('femail').value.trim();
+  const subject = document.getElementById('fsubject').value.trim();
+  const msg     = document.getElementById('fmsg').value.trim();
 
-  if (!name || !email || !msg) {
+  if (!name || !email || !subject || !msg) {
     setNote('Please fill in all fields.', '#e05c5c');
     return;
   }
@@ -241,3 +242,35 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     window.scrollTo({ top, behavior: 'smooth' });
   });
 });
+
+/* ============================================================
+   WRITING PROMO — latest pieces on the main page
+   ============================================================ */
+(async function () {
+  const listEl = document.getElementById('wpList');
+  if (!listEl) return;
+  try {
+    const res = await fetch('./writing/posts.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('posts.json unavailable');
+    const posts = await res.json();
+    posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const top = posts.slice(0, 3);
+    const fmt = iso => {
+      const d = new Date(iso + 'T00:00:00');
+      return isNaN(d) ? iso : d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    };
+    listEl.innerHTML = top.map((p, i) => `
+      <a class="wp-item" href="./writing/post.html?slug=${encodeURIComponent(p.slug)}">
+        <span class="wp-no" aria-hidden="true">№${String(posts.length - i).padStart(2,'0')}</span>
+        <div class="wp-main">
+          <h4 class="wp-title">${p.title}</h4>
+          <p class="wp-excerpt">${p.excerpt || ''}</p>
+        </div>
+        <span class="wp-date">${fmt(p.date)}</span>
+      </a>
+    `).join('');
+  } catch (err) {
+    listEl.innerHTML = '<p class="wp-loading">Couldn\'t load posts.</p>';
+    console.error(err);
+  }
+})();

@@ -6,7 +6,7 @@
   <title>Fadi Batshon — Business Economics & Analytics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Pinyon+Script&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32.png" />
   <link rel="icon" type="image/x-icon" href="favicons/favicon.ico" />
@@ -23,8 +23,8 @@
         <li><a href="#about">About</a></li>
         <li><a href="#projects">Projects</a></li>
         <li><a href="#resume">Resume</a></li>
+        <li><a href="./writing/">Writing</a></li>
         <li><a href="#contact">Contact</a></li>
-        <li><a href="./markets/">Markets</a></li>
       </ul>
       <a href="#contact" class="btn-nav-cta">Let's Talk</a>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
@@ -41,8 +41,8 @@
       <li><a href="#about"          class="mob-link">About</a></li>
       <li><a href="#projects"       class="mob-link">Projects</a></li>
       <li><a href="#resume"         class="mob-link">Resume</a></li>
+      <li><a href="./writing/"      class="mob-link">Writing</a></li>
       <li><a href="#contact"        class="mob-link">Contact</a></li>
-      <li><a href="./markets/"  class="mob-link">Markets</a></li>
       <li><a href="#contact"        class="mob-link btn-nav-cta">Let's Talk</a></li>
     </ul>
   </div>
@@ -398,11 +398,35 @@
     </div>
   </section>
 
+  <!-- ░░ WRITING ░░ -->
+  <section class="wp" id="writing">
+    <div class="wp-script" aria-hidden="true">
+      <p>The market is a voting machine in the short run and a weighing machine in the long run. Be fearful when others are greedy and greedy when others are fearful. Risk comes from not knowing what you are doing. Forecasting tells us nothing of the future, but tells us much about the forecaster. Compound interest is the most powerful force in the universe. The four most dangerous words in investing are this time it is different. The investor's chief problem, and even his worst enemy, is likely to be himself. Markets can stay irrational longer than you can stay solvent. Price is what you pay; value is what you get. Look at market fluctuations as your friend rather than your enemy; profit from folly rather than participate in it. The intelligent investor is a realist who sells to optimists and buys from pessimists. Time arbitrage is the most underrated form of edge. Patience is undervalued. Conviction is dangerous. Curiosity is the only honest posture. It is far better to buy a wonderful company at a fair price than a fair company at a wonderful price. The big money is not in the buying or selling, but in the waiting. The most important quality for an investor is temperament, not intellect. Never invest in a business you cannot understand. Our favorite holding period is forever. Wide diversification is only required when investors do not understand what they are doing. Bull markets are born on pessimism, grow on skepticism, mature on optimism, and die on euphoria. Far more money has been lost preparing for corrections than has been lost in corrections themselves. Money is made by sitting, not trading. The trend is your friend until the end when it bends. Cut your losses short and let your winners run. Discipline is choosing between what you want now and what you want most. The four most dangerous words in investing are this time it is different. Read the tape, read the room, read the data, and then write down what you actually think — clearly enough that a careful reader can argue back. The bottom line is what remains when the noise clears.</p>
+    </div>
+    <div class="container">
+      <div class="wp-grid">
+        <div class="wp-left fade-in">
+          <p class="sec-label">04 — Writing</p>
+          <h2 class="sec-h">The Bottom<br><em>Line.</em></h2>
+          <p class="wp-blurb">A working notebook on markets, money, and what the consensus is getting wrong.</p>
+          <a href="./writing/" class="btn-primary wp-cta">Read The Bottom Line</a>
+        </div>
+        <div class="wp-right fade-in">
+          <p class="wp-sublabel">Latest pieces</p>
+          <div class="wp-list" id="wpList">
+            <p class="wp-loading">Loading…</p>
+          </div>
+          <a href="./writing/archive.html" class="wp-archive-link">View full archive <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ░░ CONTACT ░░ -->
   <section class="contact" id="contact">
     <div class="container">
       <div class="sec-head fade-in">
-        <p class="sec-label">04 — Contact</p>
+        <p class="sec-label">05 — Contact</p>
         <h2 class="sec-h">Let's Connect</h2>
         <p class="sec-sub">Open to consulting, analytics, and finance opportunities.</p>
       </div>
@@ -435,6 +459,10 @@
             <div class="field">
               <label for="femail">Email</label>
               <input type="email" id="femail" name="email" placeholder="your@email.com" autocomplete="email" required />
+            </div>
+            <div class="field">
+              <label for="fsubject">Subject</label>
+              <input type="text" id="fsubject" name="subject" placeholder="What's this about?" required />
             </div>
             <div class="field">
               <label for="fmsg">Message</label>

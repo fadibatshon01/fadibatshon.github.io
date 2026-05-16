@@ -1,0 +1,51 @@
+[
+  {
+    "slug": "joining-ey",
+    "title": "Joining EY for the Summer",
+    "date": "2026-05-16",
+    "excerpt": "I'll be spending this summer as a consulting intern at EY. A short note on why this seat, why now, and what I'm hoping to learn before I'm back at a desk in the fall.",
+    "tags": ["personal", "consulting"]
+  },
+  {
+    "slug": "concentration-risk",
+    "title": "Concentration Risk Isn't Going Anywhere",
+    "date": "2026-05-02",
+    "excerpt": "A handful of names still drive most of the S&P's variance. The question isn't whether that's healthy — it's how to think about owning the index when it isn't.",
+    "tags": ["equities", "risk"]
+  },
+  {
+    "slug": "central-bank-pressers",
+    "title": "A Framework for Reading Central Bank Press Conferences",
+    "date": "2026-04-18",
+    "excerpt": "Most of what's said is choreography. The signal is in what they chose not to say — and where they paused.",
+    "tags": ["monetary policy", "frameworks", "macro"]
+  },
+  {
+    "slug": "carry-trade",
+    "title": "The Carry Trade Doesn't Care About Your Thesis",
+    "date": "2026-04-04",
+    "excerpt": "Why FX carry keeps working long after the academic argument says it shouldn't, and what that tells you about market structure.",
+    "tags": ["rates", "FX", "behavioral"]
+  },
+  {
+    "slug": "earnings-tape",
+    "title": "Notes from the Earnings Tape",
+    "date": "2026-03-15",
+    "excerpt": "A working set of observations from this quarter's prints — what beat, what missed, and what the price action actually said.",
+    "tags": ["earnings", "equities"]
+  },
+  {
+    "slug": "soft-landing",
+    "title": "Why I'm Skeptical of the Soft Landing",
+    "date": "2026-02-28",
+    "excerpt": "The yield curve has dis-inverted, unemployment is creeping up, and the consensus has quietly migrated from 'no landing' to 'soft landing.' That migration itself is the tell.",
+    "tags": ["macro", "monetary policy"]
+  },
+  {
+    "slug": "welcome",
+    "title": "What This Is, and Why",
+    "date": "2026-01-15",
+    "excerpt": "The bottom line is what's left when the noise clears. This is a working view on markets and economies — short pieces on what's moving the price, what the data says, and what the consensus is getting wrong.",
+    "tags": ["meta", "markets"]
+  }
+]

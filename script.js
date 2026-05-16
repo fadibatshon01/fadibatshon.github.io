@@ -260,7 +260,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       return isNaN(d) ? iso : d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     };
     listEl.innerHTML = top.map((p, i) => `
-      <a class="wp-item" href="./writing/post.html?slug=${encodeURIComponent(p.slug)}">
+      <a class="wp-item" href="./writing/post/?slug=${encodeURIComponent(p.slug)}">
         <span class="wp-no" aria-hidden="true">№${String(posts.length - i).padStart(2,'0')}</span>
         <div class="wp-main">
           <h4 class="wp-title">${p.title}</h4>
@@ -274,3 +274,20 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     console.error(err);
   }
 })();
+
+/* ============================================================
+   CLEAN HASH — strip #section from URL after page-load scroll
+   (cross-page nav lands here with the hash; remove it cleanly)
+   ============================================================ */
+if (window.location.hash) {
+  const target = document.querySelector(window.location.hash);
+  if (target) {
+    requestAnimationFrame(() => {
+      const nav = document.getElementById('navbar');
+      const offset = (nav ? nav.offsetHeight : 80) + 16;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'auto' });
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    });
+  }
+}

@@ -18,15 +18,15 @@
   <!-- ░░ NAVBAR ░░ -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <a href="../index.html" class="nav-logo">FB</a>
+      <a href="../" class="nav-logo">FB</a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="../index.html#about">About</a></li>
-        <li><a href="../index.html#projects">Projects</a></li>
-        <li><a href="../index.html#resume">Resume</a></li>
+        <li><a href="../#about">About</a></li>
+        <li><a href="../#projects">Projects</a></li>
+        <li><a href="../#resume">Resume</a></li>
         <li><a href="./" class="active">Writing</a></li>
-        <li><a href="../index.html#contact">Contact</a></li>
+        <li><a href="../#contact">Contact</a></li>
       </ul>
-      <a href="../index.html#contact" class="btn-nav-cta">Let's Talk</a>
+      <a href="../#contact" class="btn-nav-cta">Let's Talk</a>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
         <span></span>
         <span></span>
@@ -38,12 +38,12 @@
   <!-- ░░ MOBILE MENU ░░ -->
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <ul>
-      <li><a href="../index.html#about"    class="mob-link">About</a></li>
-      <li><a href="../index.html#projects" class="mob-link">Projects</a></li>
-      <li><a href="../index.html#resume"   class="mob-link">Resume</a></li>
+      <li><a href="../#about"    class="mob-link">About</a></li>
+      <li><a href="../#projects" class="mob-link">Projects</a></li>
+      <li><a href="../#resume"   class="mob-link">Resume</a></li>
       <li><a href="./"                     class="mob-link">Writing</a></li>
-      <li><a href="../index.html#contact"  class="mob-link">Contact</a></li>
-      <li><a href="../index.html#contact"  class="mob-link btn-nav-cta">Let's Talk</a></li>
+      <li><a href="../#contact"  class="mob-link">Contact</a></li>
+      <li><a href="../#contact"  class="mob-link btn-nav-cta">Let's Talk</a></li>
     </ul>
   </div>
 
@@ -127,7 +127,7 @@
       </div>
       <div id="postList" class="post-list" aria-live="polite"></div>
       <div id="archCtaWrap" class="arch-cta-wrap" hidden>
-        <a class="arch-cta" href="./archive.html">View all writing <span aria-hidden="true">→</span></a>
+        <a class="arch-cta" href="./archive/">View all writing <span aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
@@ -144,7 +144,7 @@
           <p class="colo-pull">"The bottom line is what's left when the noise clears — when the headline fades, the trade closes, the cycle turns."</p>
           <p class="colo-body">The Bottom Line is a working view on markets and economies — short pieces on what's actually moving the price, what the data says, and what the consensus is getting wrong. Less hot takes, more carefully held positions.</p>
           <p class="colo-body">The aim is to think clearly in public, build the muscle of reasoning under uncertainty, and accept the cost of being wrong durably. Set in <em>Cormorant Garamond</em> and <em>IBM Plex Sans</em>. Written from La Jolla. Updated whenever there's something worth saying.</p>
-          <a href="../index.html#contact" class="colo-cta">Push back, send a link <span aria-hidden="true">→</span></a>
+          <a href="../#contact" class="colo-cta">Push back, send a link <span aria-hidden="true">→</span></a>
         </div>
       </div>
     </div>
@@ -196,7 +196,7 @@
         const [latest, ...rest] = posts;
 
         featuredEl.innerHTML = `
-          <a class="feat-card" href="./post.html?slug=${encodeURIComponent(latest.slug)}">
+          <a class="feat-card" href="./post/?slug=${encodeURIComponent(latest.slug)}">
             <span class="feat-no" aria-hidden="true">№ ${String(posts.length).padStart(2,'0')}</span>
             <div class="feat-body">
               <div class="feat-top">
@@ -219,7 +219,7 @@
         const visible = rest.slice(0, ARCHIVE_LIMIT);
         listEl.innerHTML = visible.map((p, i) => `
           <article class="post-row fade-in">
-            <a class="post-row-link" href="./post.html?slug=${encodeURIComponent(p.slug)}">
+            <a class="post-row-link" href="./post/?slug=${encodeURIComponent(p.slug)}">
               <span class="post-row-no" aria-hidden="true">${String(rest.length - i).padStart(2,'0')}</span>
               <div class="post-row-main">
                 <div class="post-row-top">

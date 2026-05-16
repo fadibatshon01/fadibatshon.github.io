@@ -7,26 +7,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="../favicons/favicon.svg" />
-  <link rel="icon" type="image/png" sizes="32x32" href="../favicons/favicon-32.png" />
-  <link rel="icon" type="image/x-icon" href="../favicons/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="../favicons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/svg+xml" href="../../favicons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicons/favicon-32.png" />
+  <link rel="icon" type="image/x-icon" href="../../favicons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../../favicons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../../style.css" />
 </head>
 <body class="writing-body">
 
   <!-- ░░ NAVBAR ░░ -->
   <nav class="navbar navbar-solid" id="navbar">
     <div class="nav-container">
-      <a href="../index.html" class="nav-logo">FB</a>
+      <a href="../../" class="nav-logo">FB</a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="../index.html#about">About</a></li>
-        <li><a href="../index.html#projects">Projects</a></li>
-        <li><a href="../index.html#resume">Resume</a></li>
-        <li><a href="./" class="active">Writing</a></li>
-        <li><a href="../index.html#contact">Contact</a></li>
+        <li><a href="../../#about">About</a></li>
+        <li><a href="../../#projects">Projects</a></li>
+        <li><a href="../../#resume">Resume</a></li>
+        <li><a href="../" class="active">Writing</a></li>
+        <li><a href="../../#contact">Contact</a></li>
       </ul>
-      <a href="../index.html#contact" class="btn-nav-cta">Let's Talk</a>
+      <a href="../../#contact" class="btn-nav-cta">Let's Talk</a>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
         <span></span>
         <span></span>
@@ -38,19 +38,19 @@
   <!-- ░░ MOBILE MENU ░░ -->
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <ul>
-      <li><a href="../index.html#about"    class="mob-link">About</a></li>
-      <li><a href="../index.html#projects" class="mob-link">Projects</a></li>
-      <li><a href="../index.html#resume"   class="mob-link">Resume</a></li>
-      <li><a href="./"                     class="mob-link">Writing</a></li>
-      <li><a href="../index.html#contact"  class="mob-link">Contact</a></li>
-      <li><a href="../index.html#contact"  class="mob-link btn-nav-cta">Let's Talk</a></li>
+      <li><a href="../../#about"    class="mob-link">About</a></li>
+      <li><a href="../../#projects" class="mob-link">Projects</a></li>
+      <li><a href="../../#resume"   class="mob-link">Resume</a></li>
+      <li><a href="../"                     class="mob-link">Writing</a></li>
+      <li><a href="../../#contact"  class="mob-link">Contact</a></li>
+      <li><a href="../../#contact"  class="mob-link btn-nav-cta">Let's Talk</a></li>
     </ul>
   </div>
 
   <!-- ░░ POST ░░ -->
   <article class="post-wrap">
     <div class="post-container">
-      <a href="./" class="post-back"><span aria-hidden="true">←</span> All writing</a>
+      <a href="../" class="post-back"><span aria-hidden="true">←</span> All writing</a>
 
       <header class="post-head" id="postHead">
         <p class="post-meta" id="postMeta"></p>
@@ -62,7 +62,7 @@
       </div>
 
       <footer class="post-foot">
-        <a href="./" class="post-back"><span aria-hidden="true">←</span> Back to all writing</a>
+        <a href="../" class="post-back"><span aria-hidden="true">←</span> Back to all writing</a>
       </footer>
     </div>
   </article>
@@ -85,7 +85,7 @@
     </div>
   </footer>
 
-  <script src="../script.js"></script>
+  <script src="../../script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
   <script>
     (async function () {
@@ -97,22 +97,22 @@
 
       if (!slug) {
         titleEl.textContent = 'Post not found';
-        bodyEl.innerHTML = '<p>No post slug provided. <a href="./">Back to all writing</a>.</p>';
+        bodyEl.innerHTML = '<p>No post slug provided. <a href="../">Back to all writing</a>.</p>';
         return;
       }
 
       try {
-        const manifestRes = await fetch('./posts.json', { cache: 'no-cache' });
+        const manifestRes = await fetch('../posts.json', { cache: 'no-cache' });
         if (!manifestRes.ok) throw new Error('posts.json unavailable');
         const posts = await manifestRes.json();
         const meta = posts.find(p => p.slug === slug);
         if (!meta) {
           titleEl.textContent = 'Post not found';
-          bodyEl.innerHTML = '<p>That post doesn\'t exist. <a href="./">Back to all writing</a>.</p>';
+          bodyEl.innerHTML = '<p>That post doesn\'t exist. <a href="../">Back to all writing</a>.</p>';
           return;
         }
 
-        const mdRes = await fetch(`./posts/${slug}.md`, { cache: 'no-cache' });
+        const mdRes = await fetch(`../posts/${slug}.md`, { cache: 'no-cache' });
         if (!mdRes.ok) throw new Error('post file unavailable');
         const md = await mdRes.text();
 

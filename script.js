@@ -11,13 +11,19 @@ window.addEventListener('scroll', () => {
 /* active link via IntersectionObserver */
 const sections = document.querySelectorAll('section[id]');
 
+const matchesSection = (a, id) =>
+  a.getAttribute('href') === `#${id}` || a.getAttribute('data-section') === id;
+
 const sectionObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) return;
     const id = entry.target.id;
-    navLinks.forEach(a => {
-      a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
-    });
+    // Only update active state if some nav link actually corresponds to this
+    // section — otherwise leave the previous active state alone (e.g. when
+    // hero or other id'd sections without nav entries scroll into view).
+    const hasMatch = Array.from(navLinks).some(a => matchesSection(a, id));
+    if (!hasMatch) return;
+    navLinks.forEach(a => a.classList.toggle('active', matchesSection(a, id)));
   });
 }, { threshold: 0.45 });
 
@@ -298,19 +304,36 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   if (hash) {
     const target = document.querySelector(hash);
     if (target) {
-      setTimeout(() => {
+      const doScroll = () => {
         const nav = document.getElementById('navbar');
         const offset = (nav ? nav.offsetHeight : 80) + 16;
         const top = target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'auto' });
         history.replaceState(null, '', cleanPath + window.location.search);
-        // Explicitly set the active nav link for cross-page arrivals
-        // (the IntersectionObserver can miss for tall sections like Resume)
         const id = target.id;
         document.querySelectorAll('.nav-links a').forEach(a => {
-          a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+          a.classList.toggle('active',
+            a.getAttribute('href') === `#${id}` ||
+            a.getAttribute('data-section') === id);
         });
-      }, 220);
+      };
+
+      // If writing-promo is on this page and still loading its list async,
+      // wait for it to populate before scrolling — its layout shift would
+      // otherwise leave Contact (which sits after it) at the wrong position.
+      const wpList = document.getElementById('wpList');
+      const wpEmpty = wpList && wpList.querySelector('.wp-loading');
+      if (wpEmpty) {
+        const mo = new MutationObserver(() => {
+          mo.disconnect();
+          requestAnimationFrame(doScroll);
+        });
+        mo.observe(wpList, { childList: true });
+        // Fallback in case the fetch fails / never populates
+        setTimeout(() => { mo.disconnect(); doScroll(); }, 1500);
+      } else {
+        requestAnimationFrame(doScroll);
+      }
       return;
     }
     // Hash didn't resolve — still strip /index.html if present

@@ -2128,7 +2128,7 @@ textarea { resize: none; }
   color: var(--text);
 }
 .post-body p { margin: 0 0 1.4rem; }
-.post-body p:first-of-type::first-letter {
+.post-body > p:first-of-type::first-letter {
   font-family: var(--f-serif);
   font-size: 4.2em;
   font-weight: 500;
@@ -2227,5 +2227,5 @@ textarea { resize: none; }
   .post-row-title { font-size: 1.35rem; }
   .post-wrap { padding: 7rem 0 3rem; }
   .post-body { font-size: 1.12rem; }
-  .post-body p:first-of-type::first-letter { font-size: 3.4em; }
+  .post-body > p:first-of-type::first-letter { font-size: 3.4em; }
 }

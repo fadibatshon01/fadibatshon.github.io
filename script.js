@@ -283,7 +283,12 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 /* ============================================================
    CLEAN URL — strip /index.html and #section from the address bar
-   on page load. Scrolls to the hash target if present before stripping.
+   on page load. Scrolls to the hash target if present, sets the
+   matching nav link active, and strips the URL.
+
+   Uses a short delay so async content (writing-promo list) finishes
+   loading before we measure scroll position — otherwise layout shifts
+   after our scroll, leaving the target offset.
    ============================================================ */
 (function () {
   const path = window.location.pathname;
@@ -293,13 +298,19 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   if (hash) {
     const target = document.querySelector(hash);
     if (target) {
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         const nav = document.getElementById('navbar');
         const offset = (nav ? nav.offsetHeight : 80) + 16;
         const top = target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'auto' });
         history.replaceState(null, '', cleanPath + window.location.search);
-      });
+        // Explicitly set the active nav link for cross-page arrivals
+        // (the IntersectionObserver can miss for tall sections like Resume)
+        const id = target.id;
+        document.querySelectorAll('.nav-links a').forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+        });
+      }, 220);
       return;
     }
     // Hash didn't resolve — still strip /index.html if present

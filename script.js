@@ -240,6 +240,12 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     const offset = navbar.offsetHeight + 16;
     const top    = target.getBoundingClientRect().top + window.scrollY - offset;
     window.scrollTo({ top, behavior: 'smooth' });
+    // Immediate visual feedback for nav-link clicks
+    if (anchor.closest('.nav-links')) {
+      document.querySelectorAll('.nav-links a').forEach(a =>
+        a.classList.toggle('active', a === anchor)
+      );
+    }
   });
 });
 
@@ -276,18 +282,35 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 })();
 
 /* ============================================================
-   CLEAN HASH — strip #section from URL after page-load scroll
-   (cross-page nav lands here with the hash; remove it cleanly)
+   CLEAN URL — strip /index.html and #section from the address bar
+   on page load. Scrolls to the hash target if present before stripping.
    ============================================================ */
-if (window.location.hash) {
-  const target = document.querySelector(window.location.hash);
-  if (target) {
-    requestAnimationFrame(() => {
-      const nav = document.getElementById('navbar');
-      const offset = (nav ? nav.offsetHeight : 80) + 16;
-      const top = target.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: 'auto' });
-      history.replaceState(null, '', window.location.pathname + window.location.search);
-    });
+(function () {
+  const path = window.location.pathname;
+  const cleanPath = path.replace(/\/index\.html$/, '/');
+  const hash = window.location.hash;
+
+  if (hash) {
+    const target = document.querySelector(hash);
+    if (target) {
+      requestAnimationFrame(() => {
+        const nav = document.getElementById('navbar');
+        const offset = (nav ? nav.offsetHeight : 80) + 16;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'auto' });
+        history.replaceState(null, '', cleanPath + window.location.search);
+      });
+      return;
+    }
+    // Hash didn't resolve — still strip /index.html if present
+    if (cleanPath !== path) {
+      history.replaceState(null, '', cleanPath + window.location.search + hash);
+    }
+    return;
   }
-}
+
+  // No hash — just strip /index.html if present
+  if (cleanPath !== path) {
+    history.replaceState(null, '', cleanPath + window.location.search);
+  }
+})();

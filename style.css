@@ -1485,15 +1485,89 @@ textarea { resize: none; }
 
 @media (max-width: 600px) {
   .proj-grid { grid-template-columns: 1fr; }
+
+  /* Project cards: drop forced height + tighten interior so single-column doesn't leave orphan whitespace */
+  .proj-inner { padding: 1.6rem 1.5rem; min-height: 0; }
+  .proj-desc { margin-bottom: 1.25rem; }
+  .proj-link { margin-top: -.55rem; margin-bottom: 1rem; }
+
+  /* Capability stats: 2-col grid with the 5th item spanning, so nothing is stranded alone in a row */
+  .caps-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem .75rem;
+    padding: 1.35rem 1rem;
+  }
+  .caps-stat { min-width: 0; }
+  .caps-stat:nth-child(5) { grid-column: 1 / -1; }
+  .caps-stat + .caps-stat::before { display: none; }
 }
 
 @media (max-width: 520px) {
   .container { padding: 0 1.25rem; }
-  .hero { padding: 5.5rem 1.25rem 0; }
-  .about, .projects, .resume, .contact { padding: 3rem 0; }
+
+  /* Hero — same theme, less crowding */
+  .hero { padding: 5rem 1.25rem 2.5rem; }
+  .hero-name { margin-bottom: 1.5rem; }
+  .hero-tagline { letter-spacing: .08em; }
+  .hero-sub { margin-bottom: 1.75rem; }
+  .hero-ctas { gap: .75rem; }
+  .btn-primary, .btn-download { padding: .8rem 1.5rem; font-size: .72rem; }
   .hero::after { display: none; }
+
+  /* Unified section padding across ALL sections (caps + wp were orphans before) */
+  .about, .projects, .resume, .caps, .wp, .contact { padding: 3rem 0; }
+
+  /* About — stack the meta label/value so labels don't squeeze the value */
+  .about-grid { gap: 2.25rem; }
+  .about-avatar { width: 68px; height: 68px; margin-bottom: 1.5rem; }
+  .about-avatar span { font-size: 1.55rem; }
+  .meta-row { flex-direction: column; gap: .2rem; align-items: flex-start; }
+  .meta-k { min-width: 0; }
+  .about-meta { margin-top: 2rem; padding-top: 1.5rem; gap: 1.25rem; }
+
+  /* Projects — keep the editorial card look but tighter */
+  .proj-inner { padding: 1.4rem 1.35rem; }
+  .proj-icon { width: 36px; height: 36px; margin-bottom: .85rem; }
+  .proj-icon svg { width: 15px; height: 15px; }
+  .proj-title { font-size: 1.18rem; }
+  .proj-desc { font-size: .82rem; line-height: 1.65; }
+
+  /* Capabilities — keep the pillars, just compress padding & body */
+  .caps-top-row { gap: 1rem; margin-bottom: 1.5rem; }
+  .caps-pillar { padding: 1.45rem 1.4rem; border-radius: 12px; }
+  .caps-list { gap: .7rem; }
+  .caps-list li { font-size: .98rem; line-height: 1.5; }
+  .caps-foot { padding-top: 1.5rem; gap: 1.5rem; }
+  .caps-stat-lbl { font-size: .58rem; letter-spacing: .14em; }
+
+  /* Writing promo card */
+  .wp-grid { gap: 1.75rem; }
+  .wp-right { padding: 1.2rem 1.2rem .85rem; border-radius: 12px; }
+  .wp-blurb { font-size: 1.05rem; margin: .85rem 0 1.5rem; }
+  .wp-title { font-size: 1.05rem; }
+  .wp-excerpt { font-size: .82rem; }
+
+  /* Contact — tighter row spacing, narrower label column */
+  .contact-grid { gap: 2.5rem; }
+  .clink { gap: 1rem; padding: 1.15rem 0; }
+  .clink-label { min-width: 58px; font-size: .62rem; }
+  .clink-val { font-size: .82rem; }
+  .cform { gap: 1.1rem; }
+  .field input, .field textarea { padding: .75rem .9rem; font-size: .88rem; }
+  .btn-submit { padding: .85rem 1.75rem; font-size: .72rem; }
+
+  /* Footer */
   .footer-inner { flex-direction: column; gap: .75rem; text-align: center; }
   .footer-links { justify-content: center; }
+
+  /* Projects archive page (mobile rules were missing entirely) */
+  .arch-header { padding: 6.5rem 0 1.75rem; }
+  .arch-back { margin-bottom: 1.25rem; }
+  .arch-title { margin: .3rem 0 .6rem; }
+  .arch-sub { font-size: 1rem; }
+  .arch-main { padding: 2.5rem 0 4rem; }
+  .arch-filters { gap: .85rem; }
 }
 
 

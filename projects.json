@@ -1,5 +1,31 @@
 [
   {
+    "slug": "aurelia-finance",
+    "title": "Aurelia Finance — Personal Finance SaaS",
+    "description": "Shipped a production personal finance SaaS replacing spreadsheet workflows for income, expenses, net worth, and investments. Accountant-grade ledger across 8 transaction types with FIFO realized-gains accounting and a reconciliation invariant that guarantees verified balances never shift on edit. 15 financial-health ratios, 17 base currencies with date-accurate FX, live equity, crypto, and metals pricing. Next.js, Prisma, PostgreSQL, Stripe billing, Sentry, full CI/CD.",
+    "link": "https://aurelia-finance.vercel.app/",
+    "icon": "<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/><line x1=\"2\" y1=\"10\" x2=\"22\" y2=\"10\"/><line x1=\"6\" y1=\"15\" x2=\"10\" y2=\"15\"/>",
+    "primary": ["Business", "Tech"],
+    "secondary": ["Next.js", "TypeScript", "Prisma", "Stripe"]
+  },
+  {
+    "slug": "olist-bad-review",
+    "title": "Olist Bad-Review Risk Model",
+    "description": "Trained an XGBoost model on 95,824 Brazilian e-commerce orders to flag at-risk shipments before a 1–2 star review posts. Top decile captures 33.3% of all bad reviews — a 3.45× lift over random and +14pp recall over the existing late-flag rule. Logistic regression: each extra day late raises bad-review odds 10.5% (95% CI [1.102, 1.108]).",
+    "icon": "<path d=\"M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z\"/><line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"/><path d=\"M16 10a4 4 0 0 1-8 0\"/>",
+    "primary": ["AI", "Analytics"],
+    "secondary": ["Python", "XGBoost", "SHAP"]
+  },
+  {
+    "slug": "mgt-160-pilot",
+    "title": "Risk-Taking Field Experiment — Hype & Social Proof",
+    "description": "Designed and deployed a 2×2 between-subjects behavioral economics experiment testing whether hype framing and social-proof badges shift student risk-taking on a $1,000 portfolio. Single-page web app with server-side block randomization via Apps Script, real-money Venmo payouts to top finishers, and pre-reveal confidence capture to block hindsight bias.",
+    "link": "https://mgt-160-pilot.vercel.app",
+    "icon": "<path d=\"M9 2v6l-5 8a3 3 0 0 0 3 4h10a3 3 0 0 0 3-4l-5-8V2\"/><line x1=\"9\" y1=\"2\" x2=\"15\" y2=\"2\"/>",
+    "primary": ["Analytics", "Tech"],
+    "secondary": ["JavaScript", "Apps Script", "Experimental Design"]
+  },
+  {
     "slug": "systematic-trading",
     "title": "Systematic Trading & Performance Analytics Engine",
     "description": "Architected a trading framework integrating live market data with MA crossovers, RSI, and volatility models across 5 stocks — automating multi-asset backtesting with 70% predictive accuracy across 10,000+ data points per run.",

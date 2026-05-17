@@ -369,6 +369,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
           <span class="proj-num">${String(i + 1).padStart(2,'0')}</span>
           <h3 class="proj-title">${p.title}</h3>
           <p class="proj-desc">${p.description}</p>
+          ${p.link ? `<a class="proj-link" href="${p.link}" target="_blank" rel="noopener noreferrer">Live site <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></a>` : ''}
           <div class="proj-tags">
             ${(p.primary || []).map(t => `<span class="tag tag-primary">${t}</span>`).join('')}
             ${(p.secondary || []).map(t => `<span class="tag">${t}</span>`).join('')}

@@ -636,6 +636,34 @@ textarea { resize: none; }
   margin-bottom: 1.5rem;
 }
 
+.proj-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  width: fit-content;
+  font-size: .66rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--sky);
+  text-decoration: none;
+  margin-top: -.85rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 2;
+  transition: color .2s var(--ease), gap .2s var(--ease);
+}
+.proj-link:hover { color: var(--navy); gap: .55rem; }
+.proj-link svg {
+  width: 10px;
+  height: 10px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .proj-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: auto; }
 
 .tag {

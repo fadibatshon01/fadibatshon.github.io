@@ -348,3 +348,63 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     history.replaceState(null, '', cleanPath + window.location.search);
   }
 })();
+
+/* ============================================================
+   PROJECTS — top N on the main page, rest on /projects/
+   ============================================================ */
+(async function () {
+  const grid = document.getElementById('projGrid');
+  if (!grid) return;
+  try {
+    const res = await fetch('./projects.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('projects.json unavailable');
+    const projects = await res.json();
+    const HOME_LIMIT = 4;
+    const visible = projects.slice(0, HOME_LIMIT);
+
+    grid.innerHTML = visible.map((p, i) => `
+      <article class="proj-card fade-in">
+        <div class="proj-inner">
+          <div class="proj-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${p.icon}</svg></div>
+          <span class="proj-num">${String(i + 1).padStart(2,'0')}</span>
+          <h3 class="proj-title">${p.title}</h3>
+          <p class="proj-desc">${p.description}</p>
+          <div class="proj-tags">
+            ${(p.primary || []).map(t => `<span class="tag tag-primary">${t}</span>`).join('')}
+            ${(p.secondary || []).map(t => `<span class="tag">${t}</span>`).join('')}
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    if (projects.length > HOME_LIMIT) {
+      const cta = document.getElementById('projCtaWrap');
+      if (cta) cta.hidden = false;
+    }
+
+    // Re-attach the tilt + fade-in to the newly inserted cards
+    const lateFade = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const siblings = Array.from(entry.target.parentElement.querySelectorAll(':scope > .fade-in'));
+        const idx = siblings.indexOf(entry.target);
+        setTimeout(() => entry.target.classList.add('visible'), idx * 70);
+        obs.unobserve(entry.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    grid.querySelectorAll('.proj-card.fade-in').forEach(el => lateFade.observe(el));
+
+    grid.querySelectorAll('.proj-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        card.style.transform = `perspective(700px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) translateY(-6px)`;
+      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    });
+  } catch (err) {
+    grid.innerHTML = '<p class="proj-loading">Couldn\'t load projects.</p>';
+    console.error(err);
+  }
+})();

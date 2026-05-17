@@ -81,7 +81,7 @@ textarea { resize: none; }
   line-height: 1.7;
 }
 
-.sec-head { margin-bottom: 3.5rem; }
+.sec-head { margin-bottom: 2.5rem; }
 
 /* Scroll reveal */
 .fade-in {
@@ -159,6 +159,7 @@ textarea { resize: none; }
 .btn-nav-cta {
   display: inline-flex;
   align-items: center;
+  gap: .55rem;
   padding: .55rem 1.35rem;
   background: var(--navy);
   color: var(--white);
@@ -416,7 +417,7 @@ textarea { resize: none; }
    ABOUT — tinted off background
    ============================================================ */
 .about {
-  padding: 5rem 0;
+  padding: 3.5rem 0;
   background-color: var(--off);
 }
 
@@ -510,7 +511,7 @@ textarea { resize: none; }
    PROJECTS — white, cards with sky hover accent
    ============================================================ */
 .projects {
-  padding: 5rem 0;
+  padding: 3.5rem 0;
   background-color: var(--white);
   background-image:
     radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(27,52,84,.04) 100%),
@@ -635,8 +636,216 @@ textarea { resize: none; }
   color: var(--navy);
 }
 
+/* Primary tag — category, more emphasized than the tech tags */
+.tag-primary {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+}
+.proj-card:hover .tag-primary {
+  background: var(--navy-dark);
+  color: var(--white);
+  border-color: var(--navy-dark);
+}
+
+.proj-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--sub);
+  padding: 2rem 1rem;
+  font-size: .95rem;
+}
+
 /* ============================================================
-   RESUME — off background
+   CAPABILITIES — replaces resume timeline, recruiter-scannable
+   ============================================================ */
+.caps {
+  padding: 3.5rem 0;
+  background-color: var(--off);
+  background-image: repeating-linear-gradient(45deg, transparent 0 40px, rgba(27,52,84,.022) 40px 41px);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.caps-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Stats banner */
+.caps-stats {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 1.75rem;
+}
+.caps-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+  position: relative;
+}
+.caps-stat + .caps-stat::before {
+  content: "";
+  position: absolute;
+  left: -.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 38px;
+  width: 1px;
+  background: var(--border);
+}
+.caps-stat-num {
+  font-family: var(--f-serif);
+  font-weight: 600;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  color: var(--navy);
+  line-height: 1;
+  letter-spacing: -.01em;
+  margin-bottom: .5rem;
+  /* Force same vertical height so text + numeric stats baseline-align */
+  min-height: clamp(1.7rem, 3vw, 2.4rem);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.caps-stat-text {
+  font-size: clamp(1.15rem, 1.9vw, 1.5rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1;
+}
+.caps-stat-lbl {
+  font-family: var(--f-sans);
+  font-size: .65rem;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--sub);
+}
+
+/* 4 capability pillars */
+.caps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.caps-pillar {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem 1.85rem;
+  transition: transform .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+.caps-pillar::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--sky);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform .45s var(--ease);
+}
+.caps-pillar:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-s);
+  box-shadow: 0 18px 36px -24px rgba(27,52,84,.22);
+}
+.caps-pillar:hover::before { transform: scaleY(1); }
+.caps-pillar-title {
+  font-family: var(--f-sans);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--sky);
+  margin: 0 0 1rem;
+}
+.caps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+.caps-list li {
+  font-family: var(--f-serif);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--text);
+  padding-left: 1.1rem;
+  position: relative;
+}
+.caps-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--sky);
+  font-weight: 500;
+}
+
+/* Education + Toolkit footer */
+.caps-foot {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 1.4fr;
+  gap: 2.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.caps-foot-col {}
+.caps-foot-lbl {
+  display: block;
+  font-family: var(--f-sans);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--sky);
+  margin-bottom: .75rem;
+}
+.caps-foot-body {
+  font-family: var(--f-serif);
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+  max-width: 44ch;
+}
+.caps-foot-body strong { color: var(--navy); font-weight: 600; }
+.caps-foot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+@media (max-width: 860px) {
+  .caps-grid { grid-template-columns: 1fr; }
+  .caps-foot { grid-template-columns: 1fr; gap: 1.75rem; }
+  .caps-stats { padding: 1.4rem 1.25rem; }
+  .caps-stat { min-width: 90px; }
+  .caps-stat + .caps-stat::before { display: none; }
+}
+
+/* ============================================================
+   RESUME — off background (legacy)
    ============================================================ */
 .resume {
   padding: 5rem 0;
@@ -827,7 +1036,7 @@ textarea { resize: none; }
    WRITING PROMO — section on main page pitching The Bottom Line
    ============================================================ */
 .wp {
-  padding: 5rem 0;
+  padding: 3.5rem 0;
   position: relative;
   overflow: hidden;
   background-color: #f5f9fc;
@@ -1015,7 +1224,7 @@ textarea { resize: none; }
    CONTACT — white
    ============================================================ */
 .contact {
-  padding: 5rem 0;
+  padding: 3.5rem 0;
   background-color: var(--white);
   background-image:
     radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(27,52,84,.04) 100%),
@@ -1870,6 +2079,36 @@ textarea { resize: none; }
     linear-gradient(45deg, transparent 45%, var(--sub) 45% 55%, transparent 55%),
     linear-gradient(-45deg, transparent 45%, var(--sub) 45% 55%, transparent 55%);
   cursor: pointer;
+}
+
+/* Tag chips (projects archive) */
+.arch-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.arch-tag-chip {
+  font-family: var(--f-sans);
+  font-size: .66rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--sub);
+  background: var(--white);
+  border: 1px solid var(--border);
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
+}
+.arch-tag-chip:hover {
+  color: var(--navy);
+  border-color: var(--border-s);
+}
+.arch-tag-chip.is-active {
+  color: var(--navy);
+  background: var(--sky-light);
+  border-color: var(--sky);
 }
 
 /* Date range + count row */

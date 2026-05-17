@@ -124,15 +124,33 @@ textarea { resize: none; }
   gap: 2rem;
 }
 
+/* F | B wordmark — Morgan Stanley / JPMorgan-style typographic logo */
 .nav-logo {
-  font-family: var(--f-serif);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--navy);
+  display: inline-flex;
+  align-items: center;
+  gap: .65em;
   text-decoration: none;
-  letter-spacing: .04em;
   flex-shrink: 0;
+  padding: .15rem 0;
 }
+.nav-logo-mark {
+  font-family: var(--f-serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: .04em;
+  line-height: 1;
+  transition: color .25s var(--ease);
+}
+.nav-logo-rule {
+  display: block;
+  width: 1px;
+  height: 1.3em;
+  background: var(--sky);
+  transition: height .25s var(--ease), background .25s var(--ease);
+}
+.nav-logo:hover .nav-logo-mark { color: var(--sky); }
+.nav-logo:hover .nav-logo-rule { height: 1.6em; background: var(--navy); }
 
 .nav-links {
   display: flex;
@@ -1377,11 +1395,24 @@ textarea { resize: none; }
 }
 
 .footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: .55em;
+  color: var(--white);
+}
+.footer-logo-mark {
   font-family: var(--f-serif);
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--white);
   letter-spacing: .04em;
+  line-height: 1;
+}
+.footer-logo-rule {
+  display: block;
+  width: 1px;
+  height: 1.25em;
+  background: var(--sky);
 }
 
 .footer-copy { font-size: .78rem; color: rgba(255,255,255,.45); }
